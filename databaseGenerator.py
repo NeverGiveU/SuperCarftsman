@@ -15,7 +15,7 @@ connection = pymysql.connect(
     host="127.0.0.1",
     port=3306,
     user='root',
-    password='Winer20Chopin@',
+    password='............',# modify the password here
     charset='utf8',
     database="craftsman"
 )

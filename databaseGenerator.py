@@ -63,7 +63,6 @@ cursor.execute(sql_del)
 cursor.close()
 print('Successfully delete table \'user\'!')
 
-
 '''------------------------------------------------------------------------------------------------create table: USER'''
 sql_usr = """create table user(
 id int primary key auto_increment,

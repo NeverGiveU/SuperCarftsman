@@ -17,6 +17,37 @@
     </div>
 </div>
 
+<!--Subscribe modal-->
+<div class="subscribe-newsletter-area">
+    <div class="modal fade" id="subsModal" tabindex="-1" role="dialog" aria-describedby="subsModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="modal-body">
+                    <h5 class="title">Subscribe to log in!</h5>
+                    <form action="#" class="newsletterForm" method="post">
+                        <input type="email" name="account" id="account" placeholder="Your account/email here">
+                        <input type="email" name="password" id="password" placeholder="Your password here">
+
+                        <!--<button type="submit" class="btn original-btn">Subscribe</button>-->
+                        <div id="login" class="btn original-btn">
+                            <a href="{{url_for('from_index_to_register')}}">Login in</a>
+                        </div>
+
+                        <!--<button type="submit" class="btn original-btn">Subscribe</button>-->
+                        <div id="submit" class="btn original-btn" style="background-color: #e492ff; color: white">
+                            <a href="{{url_for('from_index_to_register')}}">Register</a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!--Head Area Start-->
 <header class="header-area">
     <!--Top header area-->
@@ -50,19 +81,87 @@
             </div>
         </div>
     </div>
-
     <!--Nav area-->
+    <div class="original-nav-area" id="stickyNav">
+        <div class="classy-nav-container breakpoint-off">
+            <div class="container">
+                <!--menu-->
+                <nav class="classy-navbar justify-content-between">
+                    <!--subscribe button-->
+                    <div class="subscribe-btn">
+                        <a href="#" class="btn subscribe-btn" data-toggle="modal" data-target="#subsModal">Subscribe</a>
+                    </div>
+                    <!--Navbar toggler-->
+                    <div class="classy-navbar-toggler">
+                        <span class="navbarToggler"><span></span><span></span><span></span></span>
+                    </div>
+                    <!--Menu-->
+                    <div class="classynav">
+                        <ul>
+
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
 </header>
 
 <!--sample area-->
 <div class="hero-area">
     <div class="hero-slides owl-carousel">
-        <div class="container h-100">
-            <div class="row h-100 align-items-center">
-                <div class="col-12">
-                    <div class="slide-content text-center">
-                        <div class="post-tag">
-                            <a href="#" data-animation="fadeInUp">lifestyle</a>
+        <!--one slide-->
+        <div class="single-hero-slide bg-img" style="background-image: url(../static/src/images/slides/slide2.png);">
+            <div class="container h-100">
+                <div class="row h-100 align-items-center">
+                    <div class="col-12">
+                        <div class="slide-content text-center">
+                            <!--
+                            <div class="post-tag">
+                                <a href="#" data-animation="fadeInUp">lifestyle</a>
+                            </div>
+                            -->
+                            <h2 data-animation="fadeInUp" data-delay="250ms">
+                                <a href="#">Art Design</a>
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--one slide-->
+        <div class="single-hero-slide bg-img" style="background-image: url(../static/src/images/slides/slide4.png);">
+            <div class="container h-100">
+                <div class="row h-100 align-items-center">
+                    <div class="col-12">
+                        <div class="slide-content text-center">
+                            <!--
+                            <div class="post-tag">
+                                <a href="#" data-animation="fadeInUp">lifestyle</a>
+                            </div>
+                            -->
+                            <h2 data-animation="fadeInUp" data-delay="250ms">
+                                <a href="#">Love her, for her</a>
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--one slide-->
+        <div class="single-hero-slide bg-img" style="background-image: url(../static/src/images/slides/slide3.png);">
+            <div class="container h-100">
+                <div class="row h-100 align-items-center">
+                    <div class="col-12">
+                        <div class="slide-content text-center">
+                            <!--
+                            <div class="post-tag">
+                                <a href="#" data-animation="fadeInUp">lifestyle</a>
+                            </div>
+                            -->
+                            <h2 data-animation="fadeInUp" data-delay="250ms">
+                                <a href="#">The Quiet</a>
+                            </h2>
                         </div>
                     </div>
                 </div>

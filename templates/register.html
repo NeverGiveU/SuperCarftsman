@@ -66,22 +66,28 @@ email char (60) not null,
                 <h1 style="margin-top: 20px">匠人堂，Welcome U!</h1>
                 <hr/>
                 <div style="text-align: left"><h5 class="title">请决定您的昵称</h5></div>
-                <input type="email" name="info" id="nickname" placeholder="e.g. Jack">
+                <input type="text" name="info" id="nickname" placeholder="e.g. Jack">
                 <div style="text-align: left; margin-top: 10px"><h5 class="title">请决定您的帐号</h5></div>
-                <input type="email" name="info" id="account" placeholder="e.g. 111111">
+                <input type="text" name="info" id="account" placeholder="e.g. 111111">
                 <div style="text-align: left; margin-top: 10px"><h5 class="title">请输入您的邮箱</h5></div>
                 <input type="email" name="info" id="email" placeholder="e.g. xxxx@qq.com">
                 <div style="text-align: left; margin-top: 10px"><h5 class="title">请决定您的密码</h5></div>
-                <input type="email" name="info" id="password" placeholder="e.g. ******">
+                <input type="password" name="info" id="password" placeholder="e.g. ******">
                 <div style="text-align: left; margin-top: 10px"><h5 class="title">请确定您的密码</h5></div>
-                <input type="email" name="info" id="password2" placeholder="">
+                <input type="password" name="info" id="password2" placeholder="">
 
                 <hr/>
-                <div id="submit" class="btn original-btn" style="background-color: #080811; color: white; margin-top: 20px;">
-                    <a href="{{url_for('register')}}" style="color: white; font-size: 20px;" id="register">Register</a>
-            </div>
 
-        </div>
+                <div id="warning" class="warning_box" style="display: none">
+                    >> WARNING...the passwords are DIFFERENT!!!
+                </div>
+
+                <div id="submit" class="btn original-btn" style="background-color: #080811; color: white; margin-top: 20px;">
+                    <a href="#" style="color: white; font-size: 20px;" id="register">Register</a>
+                </div>
+                <a href="{{url_for('index')}}" style="color: red; alignment: center; display: none; margin-top: 20px;" id="gotohome">Successfully register, please click here to continue!</a>
+            </div>
+</div>
 <!--scripts-->
 <script src="../static/js/jquery/jquery-2.2.4.min.js"></script>
 <script src="../static/js/popper.min.js"></script>

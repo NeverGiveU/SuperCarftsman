@@ -9,13 +9,14 @@
 """
 import pymysql
 from saltHashing import get_md5
+import os
 
 # connect to the database
 connection = pymysql.connect(
     host="127.0.0.1",
     port=3306,
     user='root',
-    password='............',# modify the password here
+    password='Winer20Chopin@',# modify the password here
     charset='utf8',
     database="craftsman"
 )
@@ -76,7 +77,9 @@ birth date,
 province char(20), ciy char(20), county char(20),
 procession char(20),
 signature text(200),
-photopth char (50)
+photopth char (200),
+cookie char (50),
+updatetime int default 0
 )"""
 cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
 cursor.execute(sql_usr)
@@ -166,14 +169,19 @@ cursor.close()
 print('Successfully create table \'comment\'!')
 
 '''------------------------------------------------------------------------------------------------create the manager'''
-sql_manager = "insert into user (account, salt, password, nickname, email) values ('%s', '%s', '%s', '%s', '%s')"%('manager', '0000', get_md5('752025', '0000'), 'chopin', "773347598@qq.com")
+sql_manager = "insert into user (account, salt, password, nickname, email, photopth) values ('%s', '%s', '%s', '%s', '%s', '%s')"%('manager', '0000', get_md5('752025', '0000'), 'chopin', "773347598@qq.com", "../"+'static'+'/'+'src'+'/'+'images'+'/'+'default.png')
 cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
 try:
     cursor.execute(sql_manager)
     connection.commit()
 except:
     connection.rollback()
+
 cursor.close()
+
+path = os.path.join(os.getcwd(), 'static', 'resources', 'manager')
+if not os.path.exists(path):
+    os.mkdir(path)
 print('Successfully create the manager \'user\'!')
 
 connection.close()

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎来到匠人堂</title>
+
+    <!--CSS-->
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="../static/css/self_defined_style.css">
+    <link rel="shortcut icon" href="../static/src/images/logo.ico" type="image/x-icon"/>
+</head>
+<body onload="load();">
+<!--Preloader-->
+<div id="preloader">
+    <div class="preload-content">
+        <div id="original-load"></div>
+    </div>
+</div>
+
+<!--Head Area Start-->
+<header class="header-area">
+    <!--Top header area-->
+    <div class="top-header">
+        <div class="container h-100">
+            <div class="row h-100 align-items-center">
+                <!--Breaking News Area-->
+                <div class="col-12 col-sm-8">
+                    <div class="breaking-news-area">
+                        <div id="breakingNewsTicker" class="ticker">
+                            <ul>
+                                <li><a href="#">Hello World!</a></li>
+                                <li><a href="#">Hello Universe!</a></li>
+                                <li><a href="#">Hello Original!</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--logo area-->
+    <div class="logo-area text-center">
+        <div class="container h-100">
+            <div class="row h-100 align-items-center">
+                <div class="col-12">
+                    <a href="../static/src/images/logo.png" class="original-logo" target="_blank">
+                        <img src="../static/src/images/logo.png" width="150" height="150" alt="Click to see the logo!">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Nav area-->
+
+    <div class="original-nav-area" id="stickyNav">
+        <div class="classy-nav-container breakpoint-off">
+            <div class="container">
+                <!--menu-->
+                <nav class="classy-navbar justify-content-between">
+                    <!--subscribe button-->
+
+                    <!--Navbar toggler-->
+                    <div class="classy-navbar-toggler">
+                        <span class="navbarToggler"><span></span><span></span><span></span></span>
+                    </div>
+
+                    <!--Menu-->
+                    <div class="classy-menu" id="originalNav">
+                        <div class="classycloseIcon">
+                            <div class="cross-wrap"><span class="top"> </span><span class="bottom"></span></div>
+                        </div>
+                        <!-- nav start-->
+                        <div class="classynav">
+                            <ul>
+                                <li><a href="{{url_for('index')}}" id="gotohome">Home</a> </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<!--self information board-->
+<div class="footer-framework">
+
+    <form method="post" action="/SuperCraftsman/uploadinfo" enctype="multipart/form-data">
+        <div class="subscribe-btn">
+            <button type="submit" class="btn subscribe-btn" style="display: none;" id="submit">☀🌙⭐ <b>保存修改</b> ❤♡♥</button>
+        </div>
+        <hr/>
+        <table>
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td valign="top"><img class="head_01" src="#" id="header"></td>
+                        </tr>
+
+                        <tr>
+                            <td align="center">
+                                <a class="input-file input-fileup" href="javascript:;" id="head_label">
+                                     + 选择文件<input type="file" name="head_img"/>
+                                </a>
+
+
+
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td valign="center">
+                    <!-- information -->
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<!--Footer area start-->
+<div class="footer-framework">
+    <hr/>
+    <footer class="footer-area text-center">
+        Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with ❤ by Colorlib  -  More Templates <a href="http://www.cssmoban.com/" target="_blank" title="模板之家">模板之家</a> - Modified by <a href="https://blog.csdn.net/WinerChopin" title="Chopin, Lao han, Wen di" target="_blank">匠心人</a>
+    </footer>
+</div>
+<!--scripts-->
+<script src="../static/js/jquery/jquery-2.2.4.min.js"></script>
+<script src="../static/js/popper.min.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
+<script src="../static/js/plugins.js"></script>
+<script src="../static/js/active.js"></script>
+<script src="../static/js/sharing.js"></script>
+
+<script type="text/javascript">
+    // globally info of the user
+    var state = -1;
+    var submit_flag = false;
+    var nickname = '';
+    var account = '';
+    var email = '';
+    var sex = '';
+    var birth = '';
+    var province = '';
+    var city = '';
+    var county = '';
+    var procession = '';
+    var signature = '';
+    var county = '';
+    var photopth = '';
+
+    var header = document.getElementById('header');
+
+    function check(){
+        if(submit_flag == true){
+            document.getElementById("submit").style.display="";
+        }else
+            document.getElementById("submit").style.display="none";
+    }
+    function load(){
+        var data = {
+            'state':state,
+        };
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/validation',
+            data:data,
+            dataType:'json',
+            success:function(data){
+                state = data.state;
+                if (state == 2){
+                    // successful validation
+                    nickname = data.nickname;
+                    account  = data.account;
+                    email = data.email;
+                    sex = data.sex;
+                    birth = data.birth;
+                    province = data.province;
+                    city = data.city;
+                    county = data.county;
+                    procession = data.procession;
+                    signature = data.signature;
+                    photopth = data.photopth;
+
+                    update();
+                }else{
+
+                }
+                console.log(photopth);
+            },
+            error:function(error){
+                console.log("Automatically fails!");
+                // uncorresponding cookie, need to re-login in
+                alert("登录超时，请重新登录！");
+                document.getElementById("gotohome").click();
+            }
+        })
+    }
+
+    function update(){
+        header.src = photopth;
+    }
+
+    window.onload = function(){
+        load();
+    }
+
+    /*private functions*/
+    $("#head_label").on("change", function(){
+        $("#head_label").css({ background: "#ff0000" });
+        submit_flag = true;
+        check();
+        // $("#header").attr('src', '../resources/manager/head.png');
+    })
+</script>
+
+</body>
+</html>

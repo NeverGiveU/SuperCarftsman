@@ -2,3 +2,45 @@
     margin-left: 10%;
     margin-right: 10%;
 }
+
+.warning_box{
+    background-color: #ffc3c5;
+    color: #ff1a0a;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.head_01{
+    margin: 10px;
+    width: 200px;
+    height: 200px;
+    border-radius: 200px;
+}
+
+.input-file{
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    width: auto;
+    background-color: #6c6a6e;
+    border: solid 1px #ddd;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 18px;
+    color:#fff;
+    text-decoration: none;
+}
+.input-file input[type="file"] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 14px;
+    background-color: #fff;
+    transform: translate(-300px, 0px) scale(4);
+    height: 40px;
+    opacity: 0;
+    filter: alpha(opacity=0);
+ }

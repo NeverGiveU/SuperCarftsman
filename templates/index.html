@@ -89,6 +89,7 @@
                 <nav class="classy-navbar justify-content-between">
                     <!--subscribe button-->
                     <div class="subscribe-btn">
+                        <img src="#" style="display: none; width: 50px; height: 50px; border-radius: 25px; float: left; margin-right: 25px;" id="sheader"/>
                         <a href="#" class="btn subscribe-btn" data-toggle="modal" data-target="#subsModal" id="subscribe">Subscribe</a>
                         <div class="classynav" id="self_info_board" style="display: none; ">
                             <ul>
@@ -102,6 +103,7 @@
                                 </li>
                             </ul>
                         </div>
+
                     </div>
                     <!--Navbar toggler-->
                     <div class="classy-navbar-toggler">
@@ -109,6 +111,7 @@
                     </div>
                     <!--Menu-->
                     <div class="classy-menu" id="originalNav">
+
                         <div class="classycloseIcon">
                             <div class="cross-wrap"><span class="top"> </span><span class="bottom"></span></div>
                         </div>
@@ -202,6 +205,77 @@
 <script src="../static/js/plugins.js"></script>
 <script src="../static/js/active.js"></script>
 <script src="../static/js/index2.js"></script>
+<script type="text/javascript">
+    // globally info of the user
+    var state = -1;
+    var nickname = '';
+    var account = '';
+    var email = '';
+    var sex = '';
+    var sel_year = 0;
+    var sel_month = 0;
+    var sel_day = 0;
+    var province = '';
+    var city = '';
+    var county = '';
+    var procession = '';
+    var signature = '';
+    var county = '';
+    var photopth = '';
+
+    var header = document.getElementById('header');
+    var account_level = document.getElementById('account_level');
+
+    function load(){
+        var data = {
+            'state':state,
+        };
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/validation',
+            data:data,
+            dataType:'json',
+            success:function(data){
+                state = data.state;
+                if (state == 2){
+                    // successful validation
+                    nickname = data.nickname;
+                    account  = data.account;
+                    email = data.email;
+                    sex = data.sex;
+                    sel_year = data.sel_year;
+                    sel_month = data.sel_month;
+                    sel_day = data.sel_day;
+                    province = data.province;
+                    city = data.city;
+                    county = data.county;
+                    procession = data.procession;
+                    signature = data.signature;
+                    photopth = data.photopth;
+
+                    update();
+                }else{
+
+                }
+                console.log(photopth);
+            },
+            error:function(error){
+            }
+        })
+    }
+
+    function update(){
+        document.getElementById("subscribe").style.display="none";
+        document.getElementById("self_info").innerHTML=nickname;
+        document.getElementById("self_info_board").style.display="";
+        document.getElementById("sheader").style.display="";
+        document.getElementById('sheader').src = photopth;
+    }
+
+    window.onload = function(){
+        load();
+    }
+</script>
 
 </body>
 </html>

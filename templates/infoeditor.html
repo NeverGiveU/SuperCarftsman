@@ -88,9 +88,9 @@
 <div class="footer-framework">
 
     <form method="post" action="/SuperCraftsman/uploadinfo" enctype="multipart/form-data">
-        <div class="subscribe-btn">
+        <!--<div class="subscribe-btn">
             <button type="submit" class="btn subscribe-btn" style="display: none;" id="submit">☀🌙⭐ <b>保存修改</b> ❤♡♥</button>
-        </div>
+        </div>-->
         <hr/>
         <table>
             <tr>
@@ -105,15 +105,105 @@
                                 <a class="input-file input-fileup" href="javascript:;" id="head_label">
                                      + 选择文件<input type="file" name="head_img"/>
                                 </a>
-
-
-
                             </td>
                         </tr>
                     </table>
                 </td>
                 <td valign="center">
                     <!-- information -->
+                    <h5>Hello craftsman!</h5>
+                        <!-- Reply Form -->
+                        <!--<form action="#" method="post">-->
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="group">
+                                        昵称
+                                        <input type="text" name="nickname" id="nickname" required>
+                                        <span class="highlight"></span>
+                                        <span class="bar"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="group">
+                                        E-mail
+                                        <input type="email" name="email" id="email" required>
+                                        <span class="highlight"></span>
+                                        <span class="bar"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+
+                                    <div class="group">
+                                        <!--
+                                        <input type="text" name="procession" id="procession" required>
+                                        <span class="highlight"></span>
+                                        <span class="bar"></span>
+                                        <label>职业</label>
+                                        -->
+                                        <table>
+                                            <tr>
+                                                <td align="left">职业</td>
+                                                <td align="left">性别</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <select name="procession" id="procession">
+                                                        <option value="学生">学生</option>
+                                                        <option value="教职员工">教职员工</option>
+                                                        <option value="白领">白领</option>
+                                                        <option value="工人">工人</option>
+                                                        <option value="其他">其他</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select name="sex" id="sex">
+                                                        <option value="male">正太</option>
+                                                        <option value="male">大叔</option>
+                                                        <option value="female">萝莉</option>
+                                                        <option value="female">御姐</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left">破蛋日</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <select class="sel_year" name="sel_year" id="sel_year" rel="2000"></select>年
+                                                    <select class="sel_month" name="sel_month" id="sel_month" rel="2"></select>月
+                                                    <select class="sel_day" name="sel_day" id="sel_day" rel="14"></select>日
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>籍贯</td>
+
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <select name="province" id="province"></select>
+                                                    <select name="city" id="city"></select>
+                                                    <select name="area" id="area"></select><br>
+                                                </td>
+
+                                            </tr>
+                                        </table>
+
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="group">
+                                        个性签名
+                                        <textarea name="signature" id="signature" required></textarea>
+                                        <span class="highlight"></span>
+                                        <span class="bar"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn original-btn" style="display: none;" id="submit">SAVE</button>
+                                </div>
+                            </div>
+                        <!--</form>-->
                 </td>
             </tr>
         </table>
@@ -134,16 +224,20 @@
 <script src="../static/js/plugins.js"></script>
 <script src="../static/js/active.js"></script>
 <script src="../static/js/sharing.js"></script>
+<script src="../static/js/birthday.js"></script>
+<script src="../static/js/PCASClass.js"></script>
 
 <script type="text/javascript">
     // globally info of the user
-    var state = -1;
     var submit_flag = false;
+    var state = -1;
     var nickname = '';
     var account = '';
     var email = '';
     var sex = '';
-    var birth = '';
+    var sel_year = 0;
+    var sel_month = 0;
+    var sel_day = 0;
     var province = '';
     var city = '';
     var county = '';
@@ -153,13 +247,8 @@
     var photopth = '';
 
     var header = document.getElementById('header');
+    var account_level = document.getElementById('account_level');
 
-    function check(){
-        if(submit_flag == true){
-            document.getElementById("submit").style.display="";
-        }else
-            document.getElementById("submit").style.display="none";
-    }
     function load(){
         var data = {
             'state':state,
@@ -177,7 +266,9 @@
                     account  = data.account;
                     email = data.email;
                     sex = data.sex;
-                    birth = data.birth;
+                    sel_year = data.sel_year;
+                    sel_month = data.sel_month;
+                    sel_day = data.sel_day;
                     province = data.province;
                     city = data.city;
                     county = data.county;
@@ -202,19 +293,105 @@
 
     function update(){
         header.src = photopth;
+        // set nickname
+        $("#nickname").attr("value", nickname);
+        // set e-mail
+        $("#email").attr("value", email);
+        // set signature
+        if (signature != '' && signature != undefined && signature != null){
+            $("#signature").text(signature);
+        }
+        // set procession
+        if (procession != '' && procession != undefined && procession != null){
+            $("#procession").val(procession);
+        }
+        // set sex
+        if (sex != '' && sex != undefined && sex != null){
+            $("#sex ").val(sex);
+        }
+        // set the address
+        new PCAS("province","city","area",province,city,county);
+        // set birthday
+        if (sel_year != -1){
+            $("#sel_year").val(sel_year);
+            // console.log(sel_year);
+            $("#sel_month").val(sel_month);
+            $("#sel_day").val(sel_day);
+        }
     }
-
     window.onload = function(){
         load();
     }
 
     /*private functions*/
+    function check(){
+        if (submit_flag == true){
+            document.getElementById("submit").style.display="";
+        }else{
+            document.getElementById("submit").style.display="none";
+        }
+    }
     $("#head_label").on("change", function(){
         $("#head_label").css({ background: "#ff0000" });
         submit_flag = true;
         check();
         // $("#header").attr('src', '../resources/manager/head.png');
     })
+    $("#nickname").on("change", function () {
+        submit_flag = true;
+        check();
+    })
+    $("#email").on("change", function () {
+        submit_flag = true;
+        check();
+    })
+    $("#procession").on("change", function () {
+        submit_flag = true;
+        check();
+    })
+    $("#signature").on("change", function () {
+        submit_flag = true;
+        check();
+    })
+    $("#sel_year").on("change", function () {
+        submit_flag = true;
+        check();
+    })
+    $("#sel_month").on("change", function () {
+        submit_flag = true;
+        check();
+    })
+    $("#sel_day").on("change", function () {
+        submit_flag = true;
+        check();
+    })
+    $("#province").on("change", function () {
+        submit_flag = true;
+        check();
+    })
+    $("#city").on("change", function () {
+        submit_flag = true;
+        check();
+    })
+    $("#area").on("change", function () {
+        submit_flag = true;
+        check();
+    })
+    $("#sex").on("change", function () {
+        submit_flag = true;
+        check();
+    })
+
+    $.ms_DatePicker({
+        YearSelector: ".sel_year",
+        MonthSelector: ".sel_month",
+        DaySelector: ".sel_day"
+    });
+    $.ms_DatePicker();
+
+    // new PCAS("province","city","area");
+    new PCAS("province","city","area","广东省","汕头市","潮南区");
+
 </script>
 
 </body>

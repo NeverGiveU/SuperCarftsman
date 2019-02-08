@@ -138,6 +138,31 @@
             </td>
             <td valign="center">
                 <!-- information -->
+                <table style="border-collapse:separate; border-spacing:0px 10px;">
+                    <tr>
+                        <td><div style="text-align: center; background-color: #170d28; border-radius: 5px; color: white; padding-top: 5px; padding-bottom: 5px; padding-left: 15px; padding-right: 15px;">昵称</div></td>
+                        <td align="left" valign="center"><div id="nickname" style="margin-left: 10px;">nickname</div></td>
+                        <td><div style="text-align: center; background-color: #170d28; border-radius: 5px; color: white; padding-top: 5px; padding-bottom: 5px; padding-left: 15px; padding-right: 15px;">E-mail</div></td>
+                        <td align="left" valign="center"><div id="email" style="margin-left: 10px;">e-mail</div></td>
+                    </tr>
+
+                    <tr>
+                        <td><div style="text-align: center; background-color: #170d28; border-radius: 5px; color: white; padding-top: 5px; padding-bottom: 5px; padding-left: 15px; padding-right: 15px;">职业</div></td>
+                        <td align="left" valign="center"><div id="procession" style="margin-left: 10px;">Procession</div></td>
+                    </tr>
+                    <tr>
+                        <td><div style="text-align: center; background-color: #170d28; border-radius: 5px; color: white; padding-top: 5px; padding-bottom: 5px; padding-left: 15px; padding-right: 15px;">破蛋日</div></td>
+                        <td align="left" valign="center"><div id="birthday" style="margin-left: 10px;">Birthday</div></td>
+                    </tr>
+                    <tr>
+                        <td><div style="text-align: center; background-color: #170d28; border-radius: 5px; color: white; padding-top: 5px; padding-bottom: 5px; padding-left: 15px; padding-right: 15px;">籍贯</div></td>
+                        <td align="left" valign="center"><div id="address" style="margin-left: 10px;">Address</div></td>
+                    </tr>
+                    <tr>
+                        <td><div style="text-align: center; background-color: #170d28; border-radius: 5px; color: white; padding-top: 5px; padding-bottom: 5px; padding-left: 15px; padding-right: 15px;">偶像宣言</div></td>
+                        <td align="left" valign="center"><div id="signature" style="margin-left: 10px;">Signature</div></td>
+                    </tr>
+                </table>
             </td>
         </tr>
     </table>
@@ -167,7 +192,9 @@
     var account = '';
     var email = '';
     var sex = '';
-    var birth = '';
+    var sel_year = 0;
+    var sel_month = 0;
+    var sel_day = 0;
     var province = '';
     var city = '';
     var county = '';
@@ -196,7 +223,9 @@
                     account  = data.account;
                     email = data.email;
                     sex = data.sex;
-                    birth = data.birth;
+                    sel_year = data.sel_year;
+                    sel_month = data.sel_month;
+                    sel_day = data.sel_day;
                     province = data.province;
                     city = data.city;
                     county = data.county;
@@ -221,7 +250,28 @@
 
     function update(){
         header.src = photopth;
-        account_level.innerHTML = account + "&emsp;<tr/></tr><b><i>LV: 1</i></b>";
+        // set nickname
+        $("#nickname").html(nickname);
+        // set e-mail
+        $("#email").html(email);
+        // set signature
+        if (signature != '' && signature != undefined && signature != null){
+            $("#signature").html(signature);
+        }
+        // set procession
+        if (procession != '' && procession != undefined && procession != null){
+            $("#procession").html(procession);
+        }
+        // set sex
+        if (sex != '' && sex != undefined && sex != null){
+            $("#sex ").html(sex);
+        }
+        // set the address
+        $("#address ").html(province + '-' + city + '-' + county);
+        // set birthday
+        if (sel_year != -1){
+            $("#birthday ").html(sel_year + '-' + sel_month + '-' + sel_day);
+        }
     }
 
     window.onload = function(){

@@ -91,7 +91,7 @@ def from_index_to_register():
         try:
             cursor.execute(sql_manager)
             connection.commit()
-            print('Successfully create the craftsman {}!'.format(nickname))
+            # print('Successfully create the craftsman {}!'.format(nickname))
             flag = 1
         except:
             connection.rollback()
@@ -120,7 +120,7 @@ def login():
         cursor.execute(sql)
         data = cursor.fetchall()
         if len(data) > 0:
-            print(data[0])
+            # print(data[0])
             for d in data:
                 salt = d['salt']
                 pwdh = d['password']
@@ -141,7 +141,7 @@ def login():
 
     outdate = datetime.datetime.today() + datetime.timedelta(days=1 / 24)
     ckie = str(uuid.uuid4())
-    print(ckie)
+    # print(ckie)
     # set cookie
     cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
     sql = "update user set cookie='%s' where account='%s'"%(ckie, account)
@@ -149,7 +149,7 @@ def login():
     try:
         cursor.execute(sql)
         connection.commit()
-        print("Successful modification!")
+        # print("Successful modification!")
     except:
         connection.rollback()
     cursor.close()
@@ -171,7 +171,7 @@ def validation():
         # asking for request
         state += 1                          # 0         get dealt
         if ckie is not None:
-            print(ckie)
+            # print(ckie)
             # find the usr according to cookie, get the data
             sql = "select * from user where cookie = '%s';" % ckie
             cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
@@ -182,7 +182,7 @@ def validation():
                 data = cursor.fetchall()
                 if len(data) > 0:
                     state += 1              # 2         validated
-                    print(data[0])
+                    # print(data[0])
                     for d in data:
                         nickname = d['nickname']
                         account  =d['account']
@@ -212,13 +212,22 @@ def validation():
                 connection.rollback()
             cursor.close()
             # print("dadsda1")
+
+            sel_year, sel_month, sel_day = -1, -1, -1
+            if birth is not None:
+                birth = str(birth)
+                sel_year = int(birth.split('-')[0])
+                sel_month = int(birth.split('-')[1])
+                sel_day = int(birth.split('-')[-1])
             return simplejson.dumps({
                 'state': state,
                 'nickname': nickname,
                 'account': account,
                 'email': email,
                 'sex': sex,
-                'birth': birth,
+                'sel_year': sel_year,
+                'sel_month': sel_month,
+                'sel_day': sel_day,
                 'province': province,
                 'city': city,
                 'county': county,
@@ -241,42 +250,70 @@ def allowed_file(filename):
 
 @app.route('/SuperCraftsman/uploadinfo', methods=['post'])
 def uploadinfo():
-    # print("Upload is called")
+    img, nickname, email, procession, signature, sel_year, sel_month, sel_day, province, city, area = \
+        None, None, None, None, None, None, None, None, None, None, None
+    whether_to_modify_the_photo = False
+
+    try:
+        img = request.files['head_img']
+        whether_to_modify_the_photo = True
+    except:
+        pass
+    try:
+        nickname = request.form['nickname']
+        email = request.form['email']
+        procession = request.form['procession']
+        signature = request.form['signature']
+        sex = request.form['sex']
+        sel_year = int(request.form['sel_year'])
+        sel_month = int(request.form['sel_month'])
+        sel_day = int(request.form['sel_day'])
+        province = request.form['province']
+        city = request.form['city']
+        area = request.form['area']
+    except:
+        pass
+
+    '''
+    if (nickname is not None) and (email is not None) and (procession is not None) and (signature is not None) and\
+            (sel_year is not None) and (sel_month is not None) and (sel_day is not None) and \
+            (province is not None) and (city is not None) and (area is not None):
+    '''
+
+    print(nickname)
+    print(email)
+    print(procession)
+    print(signature)
+    print(sel_year)
+    print(sel_month)
+    print(sel_day)
+    print(province)
+    print(city)
+    print(area)
+    print(sex)
+
     state = 0
-    img = request.files['head_img']
     time_ = str(int(time.time()))
     # print(img.filename)
-    if allowed_file(img.filename):
-        # img.save('temp.png')
-        # get the account
-        ckie = request.cookies.get('cookie')
-        # asking for request
-        if ckie is not None:
-            print(ckie)
-            state += 1
-            # find the usr according to cookie, get the data
-            sql = "select * from user where cookie = '%s';" % ckie
-            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
-            try:
-                cursor.execute(sql)
-                data = cursor.fetchall()
-                if len(data) > 0:
-                    state += 1
-                    # print(data[0])
-                    for d in data:
-                        nickname = d['nickname']
-                        account = d['account']
-                        email = d['email']
-                        sex = d['sex']
-                        birth = d['birth']
-                        province = d['province']
-                        city = d['ciy']
-                        county = d['county']
-                        procession = d['procession']
-                        signature = d['signature']
-                        photopth = d['photopth']
+    ckie = request.cookies.get('cookie')
+    # asking for request
+    if ckie is not None:
+        print(ckie)
+        state += 1
+        # find the usr according to cookie, get the data
+        sql = "select * from user where cookie = '%s';" % ckie
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(sql)
+            data = cursor.fetchall()
+            if len(data) > 0:
+                state += 1
+                print(data[0])
+                for d in data:
+                    account = d['account']
 
-                        # clean all the past images
+                    # clean all the past images
+                    if whether_to_modify_the_photo is True:
                         pth = os.path.join(os.getcwd(), 'static', 'resources', account)
                         ls = os.listdir(pth)
                         for i in ls:
@@ -296,26 +333,40 @@ def uploadinfo():
                         img = img.resize((width, height), Image.ANTIALIAS)
                         img.save(pth)
 
-            except:
-                connection.rollback()
-            cursor.close()
-        # save the img
-        pass
-    if state == 2:
-        # then we want to find update the info
-        pth = "../" + 'static/resources' + '/' + account + '/' + '{}_head.png'.format(time_)
-        print(pth)
-        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
-        sql = "update user set photopth='%s' where account='%s'" % (pth, account)
-        try:
-            cursor.execute(sql)
-            connection.commit()
-            print("Successful modification!")
         except:
             connection.rollback()
         cursor.close()
+    # save the img
+    pass
+    # print(state)
 
-    response = make_response(render_template('infoeditor.html'))
+    if state == 2:
+        # then we want to find update the info
+        pth = "../" + 'static/resources' + '/' + account + '/' + '{}_head.png'.format(time_)
+        # print(pth)
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+        birthday = "{}-{}-{}".format(sel_year, sel_month, sel_day)
+        if whether_to_modify_the_photo is True:
+            sql = "update user set photopth='%s', nickname='%s', email='%s', sex='%s', procession='%s', signature='%s', " \
+                  "province='%s', ciy='%s', county='%s', birth='%s' where account='%s'" % \
+                  (pth, nickname, email, sex, procession, signature, province, city, area, birthday, account)
+            # print("{}-{}".format(whether_to_modify_the_photo, 1))
+        else:
+            sql = "update user set nickname='%s', email='%s', sex='%s', procession='%s', signature='%s', " \
+                  "province='%s', ciy='%s', county='%s', birth='%s' where account='%s'" % \
+                  (nickname, email, sex, procession, signature, province, city, area, birthday, account)
+            # print("{}-{}".format(whether_to_modify_the_photo, 2))
+        try:
+            cursor.execute(sql)
+            connection.commit()
+            # print("Successful modification!")
+        except:
+            connection.rollback()
+            # print("Failed modification!")
+        cursor.close()
+
+
+    response = make_response(render_template('selfinfo.html'))
     return response
 
 if __name__ == '__main__':

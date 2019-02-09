@@ -161,6 +161,16 @@ def selfinfo():
     response = make_response(render_template('selfinfo.html'))
     return response
 
+"""===================================================================================================== tutorials' part """
+@app.route('/SuperCraftsman/tutorialeditor', methods=['GET', 'POST'])
+def tutorialeditor():
+    response = make_response(render_template('tutorialeditor.html'))
+    return response
+
+@app.route('/SuperCraftsman/uploadtutorial', methods=['post'])
+def uploadtutorial():
+    return 'SUCCESS'
+
 """===================================================================================================== users' part """
 @app.route('/SuperCraftsman/validation', methods=['GET', 'POST'])
 def validation():
@@ -367,6 +377,12 @@ def uploadinfo():
 
 
     response = make_response(render_template('selfinfo.html'))
+    return response
+
+# 个人主页
+@app.route('/SuperCraftsman/selfhome')
+def selfhome():
+    response = make_response(render_template('selfhome.html'))
     return response
 
 if __name__ == '__main__':

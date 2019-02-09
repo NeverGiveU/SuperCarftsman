@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>...的主页</title>
+    <!--CSS-->
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="../static/css/self_defined_style.css">
+    <link rel="stylesheet" href="../static/css/paging.css">
+    <link rel="stylesheet" href="../static/css/content_toolbar.css">
+    <link rel="stylesheet" href="../static/css/list-b85bd04713.min.css">
+    <link rel="stylesheet" href="../static/css/skin-yellow-2eefd34acf.min.css">
+    <link rel="stylesheet" href="../static/css/sandalstrap.min.css">
+    <!--
+    <link rel="stylesheet" href="https://csdnimg.cn/public/common/toolbar/content_toolbar_css/content_toolbar.css">
+    <link rel="stylesheet" href="https://csdnimg.cn/release/phoenix/vendor/pagination/paging.css">
+    -->
+    <link rel="shortcut icon" href="../static/src/images/logo.ico" type="image/x-icon"/>
+</head>
+<body onload="load();" class="nodata">
+<!--html-->
+<!--bg-->
+<div id="wrapper"></div>
+<!--title-->
+<header>
+    <div class="container d-flex clearfix" style="background-image: none">
+        <div class="title-box">
+            <h1 class="title-blog">
+                <p id="title_nickname" style="font-size: 35px; color: black;">Winner</p>
+                <p class="description" id="title_signature" style="width: 70%; height: auto;">i do like you</p>
+            </h1>
+        </div>
+        <div class="opt-box d-flex justify-content-end">
+            <a class="btn btn-sm" href="{{url_for('tutorialeditor')}}">
+				<svg class="icon" aria-hidden="true">
+					<use xlink:href="#csdnc-cog">
+                        #shadow-root(closed)
+                        <svg id="csdnc-cog" viewBox="0 0 1024 1024" width="100%" height="100%">
+                            <path d="M796.437333 549.632c1.536-12.288 2.688-24.554667 2.688-37.653333 0-13.034667-1.152-25.344-2.688-37.632l80.746667-63.36a19.456 19.456 0 0 0 4.650667-24.597334l-76.565334-132.885333c-4.608-8.448-14.912-11.52-23.36-8.448l-95.317333 38.4a279.168 279.168 0 0 0-64.682667-37.632l-14.528-101.781333a18.730667 18.730667 0 0 0-18.773333-16.128h-153.109333a18.709333 18.709333 0 0 0-18.752 16.128l-14.549334 101.781333c-23.338667 9.6-44.778667 22.656-64.682666 37.632l-95.296-38.4a18.624 18.624 0 0 0-23.36 8.448l-76.544 132.885333a18.986667 18.986667 0 0 0 4.586666 24.597334l80.746667 63.36c-1.536 12.288-2.666667 24.96-2.666667 37.632 0 12.693333 1.152 25.344 2.666667 37.653333l-80.746667 63.402667a19.328 19.328 0 0 0-4.586666 24.533333l76.544 132.885333c4.586667 8.448 14.933333 11.52 23.36 8.448l95.296-38.421333a280.533333 280.533333 0 0 0 64.682666 37.674667l14.549334 101.781333a18.730667 18.730667 0 0 0 18.752 16.128h153.109333a18.752 18.752 0 0 0 18.773333-16.128l14.528-101.781333c23.338667-9.621333 44.821333-22.677333 64.682667-37.674667l95.317333 38.421333c8.810667 3.477333 18.773333 0 23.36-8.448l76.565334-132.885333c4.565333-8.448 2.645333-18.816-4.608-24.533333l-80.789334-63.402667zM512 668.757333c-86.421333 0-156.757333-70.336-156.757333-156.778666 0-86.421333 70.336-156.757333 156.757333-156.757334 86.442667 0 156.736 70.336 156.736 156.757334 0 86.442667-70.293333 156.778667-156.736 156.778666z" fill></path>
+                        </svg>
+                    </use>
+                </svg>
+                管理教程
+            </a>
+        </div>
+    </div>
+</header>
+<b/>
+<div class="container clearfix pt-0" id="mainBox">
+    <table>
+        <tr>
+            <td valign="top">
+                <aside>
+                    <div class="aside-box" id="asideProfile">
+                        <div class="profile-intro d-flex">
+                            <!--nick name and the head image-->
+                            <div class="avatar-box d-flex justify-content-center flex-column">
+                                <a href="#"><img src="#" class="avatar_pic" id="profile_head"/></a>
+                                <p class="name csdn-tracking-statistics tracking-click" data-mod="popu_379" style="float: left;">
+                                    <a href="#" target="_blank" class="" id="profile_nickname" class="uid">萧班</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="data-info d-flex item-tiling">
+                            <dl class="text-center">
+                                <dt><a href="#">教程</a> </dt>
+                                <dd><a href="#"><span class="count" id="profile_count_tutorial">?</span> </a> </dd>
+                            </dl>
+                            <dl class="text-center">
+                                <dt><a href="#">粉丝</a> </dt>
+                                <dd><a href="#"><span class="count" id="profile_count_fan">?</span> </a> </dd>
+                            </dl>
+                            <dl class="text-center">
+                                <dt><a href="#">喜欢</a> </dt>
+                                <dd><a href="#"><span class="count" id="profile_count_focus">?</span> </a> </dd>
+                            </dl>
+                        </div>
+                        <div class="grade-box clearfix">
+                            <dl>
+                                <dt>LV: </dt>
+                                <dd>
+                                    <a href="#"><span class="count" id="profile_lv">?</span> </a>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </aside>
+            </td>
+            <td>
+                <main>
+                    <div class="filter-box d-flex align-items-center">
+                        <dl class="filter-sort-box d-flex align-items-center">
+                            <dt>排序：</dt>
+                            <dd>
+                                <a href="#" class="btn-filter-sort active" target="_self">默认</a>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="article-list">
+                        <!--tutorial item-->
+                    </div>
+                </main>
+            </td>
+        </tr>
+    </table>
+
+
+</div>
+
+<!--javascript-->
+<script src="../static/js/jquery/jquery-2.2.4.min.js"></script>
+<script src="../static/js/popper.min.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
+<script src="../static/js/plugins.js"></script>
+<script src="../static/js/active.js"></script>
+<script type="text/javascript">
+    // validate
+    var state = -1;
+    var nickname = '';
+    var account = '';
+    var email = '';
+    var sex = '';
+    var sel_year = 0;
+    var sel_month = 0;
+    var sel_day = 0;
+    var province = '';
+    var city = '';
+    var county = '';
+    var procession = '';
+    var signature = '';
+    var county = '';
+    var photopth = '';
+
+    function load(){
+        var data = {
+            'state':state,
+        };
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/validation',
+            data:data,
+            dataType:'json',
+            success:function(data){
+                state = data.state;
+                if (state == 2){
+                    // successful validation
+                    nickname = data.nickname;
+                    account  = data.account;
+                    email = data.email;
+                    sex = data.sex;
+                    sel_year = data.sel_year;
+                    sel_month = data.sel_month;
+                    sel_day = data.sel_day;
+                    province = data.province;
+                    city = data.city;
+                    county = data.county;
+                    procession = data.procession;
+                    signature = data.signature;
+                    photopth = data.photopth;
+                    // console.log("Automatically successes!");
+                    update();
+                }else{
+
+                }
+                console.log(photopth);
+            },
+            error:function(error){
+                console.log("Automatically fails!");
+                // uncorresponding cookie, need to re-login in
+                alert("登录超时，请重新登录！");
+                document.getElementById("gotohome").click();
+            }
+        })
+    }
+
+
+
+    function update() {
+        // console.log(nickname);
+        document.title=nickname + '的主页';
+        $("#title_nickname").text(nickname + '的主页');
+        $("#profile_nickname").text(nickname);
+        document.getElementById("profile_head").src = photopth;
+        if (signature != '' && signature != undefined && signature != null){
+            $("#title_signature").text(signature);
+        }
+
+    }
+
+    window.onload = function(){
+        load();
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>匠人堂-编写我的文章</title>
+    <!--CSS-->
+    <link rel="stylesheet" href="../static/css/content_toolbar.css">
+    <link rel="stylesheet" href="../static/css/self_defined_style.css">
+    <link rel="stylesheet" href="../static/css/list-b85bd04713.min.css">
+    <link rel="stylesheet" href="../static/css/skin-yellow-2eefd34acf.min.css">
+    <link rel="stylesheet" href="../static/css/sandalstrap.min.css">
+</head>
+
+<form method="post" action="/SuperCraftsman/uploadtutorial" enctype="multipart/form-data">
+    <table style="margin-top: 100px; margin-bottom: 100px; margin-left: 10%; margin-right: 10%; alignment: center; border-collapse:separate; border-spacing:10px;" width="80%" >
+        <tr>
+            <td valign="top" width="10%">
+                <!--functions-->
+                <div id="new_tutorial_btn" class="filter-box d-flex align-items-center" onmouseover="this.className='hover_div d-flex align-items-center'" onmouseout="this.className='filter-box d-flex align-items-center'">
+                    <a href="#">新建教程 <b>++</b></a>
+                </div>
+                <div id="new_step_btn" class="filter-box d-flex align-items-center" onmouseover="this.className='hover_div d-flex align-items-center'" onmouseout="this.className='filter-box d-flex align-items-center'">
+                    <a>新建步骤 <b>+</b></a>
+                </div>
+                <br/>
+
+                <div class="filter-box d-flex align-items-center" onmouseover="this.className='hover_div d-flex align-items-center'" onmouseout="this.className='filter-box d-flex align-items-center'">
+                    <button id="save_submit_btn" type="submit" class="btn original-btn" id="submit" onclick="return check();">SAVE</button>
+                </div>
+            </td>
+            <td valign="top" width="90%" id="tutorial_steps">
+                <div class="filter-box d-flex align-items-center">
+                    <input type="text" name="tutorial_title" id="tutorial_title" placeholder=">> 编辑标题..." class="title_text" style="display: none"/>
+                </div>
+                <br/>
+
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+
+<!--scripts-->
+<script src="../static/js/jquery/jquery-2.2.4.min.js"></script>
+<script src="../static/js/popper.min.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
+<script src="../static/js/plugins.js"></script>
+<script src="../static/js/active.js"></script>
+<script src="../static/js/index2.js"></script>
+
+<script type="text/javascript">
+    var new_tutorial_flag  =false;
+    var new_step_flag = false;
+    var save_flag = false;
+    var tutorial_title = document.getElementById('tutorial_title');
+    var tutorial_steps = document.getElementById('tutorial_steps');
+    var step_count = 0;
+
+    $('#new_tutorial_btn').on("click", function () {
+        new_tutorial_flag = true;
+        tutorial_title.value="";
+        tutorial_title.style.display="";
+    });
+    $('#new_step_btn').on("click", function () {
+        if(new_tutorial_flag == true){
+            new_step_flag = true;
+            step_count = step_count + 1;
+            // console.log("yes");
+            // to add new components
+            addStep();
+        }
+    });
+    $('#save_submit_btn').on("click", function () {
+        console.log(save_flag);
+    });
+    
+    function addStep() {
+        var mydiv = document.createElement("div");
+        // to configure the div for each step
+        tutorial_steps.appendChild(mydiv);
+    }
+
+    function check() {
+        if (new_tutorial_flag == true && new_step_flag == true){
+            save_flag = true;
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+</script>
+
+</html>

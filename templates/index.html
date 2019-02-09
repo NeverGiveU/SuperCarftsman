@@ -99,6 +99,7 @@
                                     </a>
                                     <ul class="dropdown">
                                         <li><a href="{{url_for('selfinfo')}}" target="_blank" style="background-color: white; padding-left: 20px;">个人中心</a></li>
+                                        <li><a href="{{url_for('selfhome')}}" target="_blank" style="background-color: white; padding-left: 20px;">个人主页</a></li>
                                     </ul>
                                 </li>
                             </ul>
@@ -271,6 +272,8 @@
         document.getElementById("sheader").style.display="";
         document.getElementById('sheader').src = photopth;
     }
+
+
 
     window.onload = function(){
         load();

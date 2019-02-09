@@ -44,3 +44,16 @@
     opacity: 0;
     filter: alpha(opacity=0);
  }
+
+.hover_div{
+    padding:0 24px;height:48px;background: rgba(173, 163, 215, 0.33);
+    -webkit-box-shadow:0 2px 4px 0 rgba(255, 255, 255, 0.05);
+    box-shadow:0 2px 4px 0 rgb(255, 255, 255);
+}
+.filter-box .chk-box{color: #ffffff;cursor:pointer;}
+
+.title_text{
+    border: none;
+    font-size: xx-large;
+    margin: 20px;
+}

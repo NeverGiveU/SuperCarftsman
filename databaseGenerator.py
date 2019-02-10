@@ -143,6 +143,8 @@ print("Successfully create table \'collection\'!")
 sql_tut = '''create table tutorial(
 id int primary key auto_increment,
 srcpth char(100),
+title char(200),
+num_like int default 0,
 host_id int,
 foreign  key(host_id) references achievement(id)
 )
@@ -158,7 +160,7 @@ id int primary key auto_increment,
 gdatetime datetime,
 context text(1000),
 usr_id int,
-numlike int,
+num_like int,
 tutorial_id int,
 foreign key(tutorial_id) references tutorial(id),
 reply_id int default -1
@@ -176,7 +178,15 @@ try:
     connection.commit()
 except:
     connection.rollback()
+cursor.close()
 
+sql_manager = "insert into achievement (level, exp, user_id) values (%d, %f, 1)"%(0, 0.0)
+cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+try:
+    cursor.execute(sql_manager)
+    connection.commit()
+except:
+    connection.rollback()
 cursor.close()
 
 path = os.path.join(os.getcwd(), 'static', 'resources', 'manager')

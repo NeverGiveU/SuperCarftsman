@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>匠人堂-编写我的文章</title>
+
+    <link rel="shortcut icon" href="../static/src/images/logo.ico" type="image/x-icon"/>
     <!--CSS-->
     <link rel="stylesheet" href="../static/css/content_toolbar.css">
     <link rel="stylesheet" href="../static/css/self_defined_style.css">
@@ -11,9 +13,10 @@
     <link rel="stylesheet" href="../static/css/sandalstrap.min.css">
 </head>
 
-<form method="post" action="/SuperCraftsman/uploadtutorial" enctype="multipart/form-data">
+<form method="post" action="/SuperCraftsman/uploadtutorial" enctype="multipart/form-data" id="form_tut">
     <table style="margin-top: 100px; margin-bottom: 100px; margin-left: 10%; margin-right: 10%; alignment: center; border-collapse:separate; border-spacing:10px;" width="80%" >
         <tr>
+            <input type="text" id="count_val" name="count_val" style="display: none;"/>
             <td valign="top" width="10%">
                 <!--functions-->
                 <div id="new_tutorial_btn" class="filter-box d-flex align-items-center" onmouseover="this.className='hover_div d-flex align-items-center'" onmouseout="this.className='filter-box d-flex align-items-center'">
@@ -37,7 +40,15 @@
             </td>
         </tr>
     </table>
+
 </form>
+<!--
+<div>
+<img src="" class="img">
+</div>
+
+<input type="file" id="imgInput">
+-->
 </body>
 
 <!--scripts-->
@@ -49,12 +60,15 @@
 <script src="../static/js/index2.js"></script>
 
 <script type="text/javascript">
+
     var new_tutorial_flag  =false;
     var new_step_flag = false;
     var save_flag = false;
     var tutorial_title = document.getElementById('tutorial_title');
     var tutorial_steps = document.getElementById('tutorial_steps');
     var step_count = 0;
+    var arr_flags = new Array();
+    var img_name = "";
 
     $('#new_tutorial_btn').on("click", function () {
         new_tutorial_flag = true;
@@ -68,26 +82,133 @@
             // console.log("yes");
             // to add new components
             addStep();
+            save_flag = false;
+            $('#count_val').val(step_count);
         }
     });
     $('#save_submit_btn').on("click", function () {
         console.log(save_flag);
+        /*
+        var data = {
+            'a':1
+        };
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/uploadtutorial',
+            data: data,
+            dataType:'json',
+            success:function(data){
+                state = data.state;
+                if (state >= 2){
+                    console.log(state);
+                }else{
+
+                }
+            },
+            error:function(error){
+                console.log("Automatically fails!");
+                // uncorresponding cookie, need to re-login in
+                alert("登录超时，请重新登录！");
+                document.getElementById("gotohome").click();
+            }
+        });
+        */
     });
-    
+    /*
+	$("#form_tut").submit(function(data){
+		alert("提交成功！");
+	});
+    */
+
     function addStep() {
+        arr_flags[step_count-1] = false;
         var mydiv = document.createElement("div");
+        if (step_count>1){
+            mydiv.setAttribute('class', 'd-flex align-items-center div_step');
+        }
+        else{
+            mydiv.setAttribute('class', 'd-flex align-items-center div_step_top');
+        }
+
+        var p = document.createElement('p');//创建p节点
+        p.innerHTML = 'Step ' + step_count;//p节点显示的文字
+        p.setAttribute("class", 'count_step');
+        mydiv.appendChild(p);
+        mydiv.appendChild(document.createElement('br'));
+
+        var table = document.createElement('table');
+        var row = table.insertRow();
+
+        var img_cell = row.insertCell(0);
+        img_cell.setAttribute('class', 'item0');
+        img_cell.setAttribute('white-space', 'nowrap');
+        var img = document.createElement('img');
+        img.setAttribute('id', 'img_' + step_count);
+        img_name = '#img_' + step_count;
+        img.setAttribute('class', 'img_step');
+        img.setAttribute('src', '../static/src/images/default_t2.png');
+        img_cell.appendChild(img);
+        img_cell.appendChild(document.createElement('br'));
+
+        var img_up = document.createElement('input');
+        img_up.setAttribute('type', 'file');
+        img_up.setAttribute('name', 'imgup_' + step_count);
+        img_up.setAttribute('id', 'imgup_' + step_count);
+        img_up.setAttribute('class', 'img_upload');
+
+        img_up.addEventListener("change", function () {
+            console.log(img_name);
+            $(img_name).attr("src", URL.createObjectURL($(this)[0].files[0]));
+            arr_flags[parseInt(img_name.split("_")[1])-1] = true;
+        });
+
+        var img_a = document.createElement('a');
+        img_a.setAttribute('class', 'img_upload');
+        img_a.setAttribute('id', 'imgupload_' + step_count);
+        img_a.setAttribute('href', '#');
+        img_a.innerHTML='上传图片';
+        img_a.appendChild(img_up);
+        img_cell.appendChild(img_a);
+
+        var txt_cell = row.insertCell(1);
+        txt_cell.setAttribute('class', 'item1');
+        txt_cell.setAttribute('valign', 'top');
+        var text = document.createElement('textarea');
+        text.setAttribute("id", "txtup_" + step_count);
+        text.setAttribute("name", "txtup_" + step_count);
+        text.setAttribute("class", 'text_step');
+        txt_cell.appendChild(text);
+
+        mydiv.appendChild(table);
+
         // to configure the div for each step
         tutorial_steps.appendChild(mydiv);
     }
 
     function check() {
         if (new_tutorial_flag == true && new_step_flag == true){
-            save_flag = true;
+            var len = arr_flags.length;
+            var i = 0;
+            for (i = 0; i < len; ++i)
+                if (arr_flags[i] == false)
+                    return false;
             return true;
         }
         else{
             return false;
         }
+    }
+
+    function bindAvatar2() {
+        console.log(2);
+        $("#imgup_1").change(function () {
+            var obj=$("#imgup_1")[0].files[0];
+            var fr=new FileReader();
+            fr.onload=function () {
+                $("#img_1").attr('src',this.result);
+                console.log(this.result);
+            };
+        });
     }
 
 </script>

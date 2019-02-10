@@ -8,7 +8,7 @@
 @time: 2019/1/30 20:40
 """
 
-from flask import Flask, request, render_template, make_response, redirect, url_for
+from flask import Flask, request, render_template, make_response
 import pymysql
 import simplejson
 import uuid
@@ -81,7 +81,7 @@ def from_index_to_register():
         if not os.path.exists(path):
             os.mkdir(path)
 
-        outdate = datetime.datetime.today() + datetime.timedelta(days=1 / 24)
+        outdate = datetime.datetime.today() + datetime.timedelta(days=1)
         ckie = str(uuid.uuid4())
 
         salt = get_salt()
@@ -98,6 +98,26 @@ def from_index_to_register():
             flag = -1
         cursor.close()
 
+        count = 0
+        sql = "select count(*) as value from user"
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(sql)
+            count = cursor.fetchall()
+        except:
+            connection.rollback()
+        cursor.close()
+
+        # achievement
+        sql_manager = "insert into achievement (level, exp, user_id) values (%d, %f, %d)" % (0, 0.0, count[0]['value'])
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(sql_manager)
+            connection.commit()
+        except:
+            connection.rollback()
+        cursor.close()
+
         response = make_response(simplejson.dumps({
             'res': flag
         }))
@@ -106,9 +126,6 @@ def from_index_to_register():
 
 @app.route('/SuperCraftsman/login', methods=['POST', 'GET'])
 def login():
-    # print(ckie)
-
-    # print('2123')
     account = request.args.get('account', '')
     password = request.args.get('password', '')
 
@@ -139,7 +156,7 @@ def login():
         'nickname': nickname
     }))
 
-    outdate = datetime.datetime.today() + datetime.timedelta(days=1 / 24)
+    outdate = datetime.datetime.today() + datetime.timedelta(days=1)
     ckie = str(uuid.uuid4())
     # print(ckie)
     # set cookie
@@ -169,7 +186,164 @@ def tutorialeditor():
 
 @app.route('/SuperCraftsman/uploadtutorial', methods=['post'])
 def uploadtutorial():
-    return 'SUCCESS'
+    # print(request.args.get('a'))
+    # print("uploadtutorial called")
+    title = request.form['tutorial_title']
+    title_ = ""
+
+    for i in range(len(title)-1):
+        title_ += str(ord(title[i]))
+        title_ += '-'
+    title_ += str(ord(title[-1]))
+    # print(title)
+    count = int(request.form['count_val'])
+    img_names = []
+    txt_names = []
+    for i in range(1, count+1):
+        img = request.files['imgup_{}'.format(i)]
+        img_names.append(img.filename)
+        txt = request.form['txtup_{}'.format(i)]
+        txt_names.append(txt)
+        # print(img.filename)
+        # print(txt)
+        pass
+
+    # find whether it has been created
+    new_flag = False
+    state = 1
+
+    # find the user_id according cookie
+    ckie = request.cookies.get('cookie')
+    if True:
+        if ckie is not None:
+            # print(ckie)
+            # find the usr according to cookie, get the data
+            sql = "select * from user where cookie = '%s';" % ckie
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+            try:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+                if len(data) == 1:
+                    state += 1
+                    d = data[0]
+                    user_id = int(d['id'])
+            except:
+                connection.rollback()
+            cursor.close()
+
+    if state == 2:
+        sql = "select * from tutorial where host_id = %d and title = '%s';" % (user_id, title_)
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(sql)
+            data = cursor.fetchall()
+            print("用中文查询成功")
+            print(len(data))
+            if len(data) == 0:
+                # not found
+                state += 1
+                # get tutorial count
+                count2 = 0
+                sql3 = "select count(*) as value from tutorial"
+                cursor3 = connection.cursor(cursor=pymysql.cursors.DictCursor)
+                try:
+                    cursor3.execute(sql3)
+                    count2 = (cursor3.fetchall())[0]['value']
+                    # print(count)
+                except:
+                    connection.rollback()
+                cursor3.close()
+
+                # newly build dir
+                pth = os.path.join(os.getcwd(), 'tutorials', str(count2+1))
+                print(pth)
+                if not os.path.exists(pth):
+                    # print("dasda")
+                    os.mkdir(pth)
+                    os.mkdir(os.path.join(pth, 'src'))
+                    fobj = open(os.path.join(pth, 'strut.txt'), 'w')
+                    fobj.close()
+                    fobj = open(os.path.join(pth, 'comment.txt'), 'w')
+                    fobj.close()
+
+                # new record
+                sql2 = "insert into tutorial (srcpth, title, host_id) values ('%s', '%s', %d)" % (str(count2+1), title_, user_id)
+                cursor2 = connection.cursor(cursor=pymysql.cursors.DictCursor)
+                try:
+                    cursor2.execute(sql2)
+                    connection.commit()
+                except:
+                    connection.rollback()
+                cursor2.close()
+            else:
+                # the tutorial has already existed
+                print("found it!")
+                d = data[0]
+                pth = d['srcpth']
+                pth = os.path.join(os.getcwd(), 'tutorials', pth)
+        except:
+            connection.rollback()
+        cursor.close()
+
+    # then we try to load the resources
+    if state >= 2:
+        # we have gotten the pth
+        # print(os.listdir(pth))
+        images = os.listdir(os.path.join(pth, 'src'))
+        for image in images:
+            os.remove(os.path.join(pth, 'src', image))
+        '''
+        for i in range(1, count+1):
+            pass
+        '''
+        # print(img_names)
+        # print(txt_names)
+        strut = open(os.path.join(pth, 'strut.txt'), 'w', encoding='utf-8')
+        strut.write(title + '\n')
+        for i in range(1, count + 1):
+            img = request.files['imgup_{}'.format(i)]
+            img.save(os.path.join(pth, 'src', '{}.png'.format(i)))
+            txt = request.form['txtup_{}'.format(i)]
+            strut.write(txt + '\n<>\n')
+        strut.close()
+        pass
+    '''
+    return simplejson.dumps({
+        'state': state
+    })
+    '''
+    if state >= 2:
+        return """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>新增教程成功！</title>
+        <link rel="shortcut icon" href="../static/src/images/logo.ico" type="image/x-icon"/>
+    </head>
+    <body>
+    <p>请关闭此窗口！</p>
+    <script type="text/javascript">
+        alert("添加教程成功！");
+    </script>
+    </body>
+        """
+    else:
+        return """
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <title>新增教程成功！</title>
+                <link rel="shortcut icon" href="../static/src/images/logo.ico" type="image/x-icon"/>
+            </head>
+            <body>
+            <p>请关闭此窗口！</p>
+            <script type="text/javascript">
+                alert("登录超时导致添加教程失败，请重新登录！");
+            </script>
+            </body>
+                """
 
 """===================================================================================================== users' part """
 @app.route('/SuperCraftsman/validation', methods=['GET', 'POST'])
@@ -182,7 +356,7 @@ def validation():
         state += 1                          # 0         get dealt
         if ckie is not None:
             # print(ckie)
-            # find the usr according to cookie, get the data
+            # user information
             sql = "select * from user where cookie = '%s';" % ckie
             cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
             state += 1                      # 1         with cookie
@@ -205,6 +379,7 @@ def validation():
                         procession = d['procession']
                         signature = d['signature']
                         photopth =d['photopth']
+                        user_id  =d['id']
                         '''
                         print(nickname)
                         print(account)
@@ -229,6 +404,21 @@ def validation():
                 sel_year = int(birth.split('-')[0])
                 sel_month = int(birth.split('-')[1])
                 sel_day = int(birth.split('-')[-1])
+            # get tutorial paths
+            t_pths = []
+            if state == 2:
+                sql = "select * from tutorial where host_id = %d;" % (user_id)
+                cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+                try:
+                    cursor.execute(sql)
+                    data = cursor.fetchall()
+                    for d in data:
+                        t_pths.append(d['id'])
+                except:
+                    pass
+                cursor.close()
+                print(t_pths)
+
             return simplejson.dumps({
                 'state': state,
                 'nickname': nickname,
@@ -243,7 +433,8 @@ def validation():
                 'county': county,
                 'procession': procession,
                 'signature': signature,
-                'photopth': photopth
+                'photopth': photopth,
+                't_pths': t_pths
             })
         pass
     return 'SUCCESS'

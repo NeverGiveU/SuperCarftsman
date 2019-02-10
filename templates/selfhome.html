@@ -96,7 +96,7 @@
                             </dd>
                         </dl>
                     </div>
-                    <div class="article-list">
+                    <div class="article-list" id="tutorial_db">
                         <!--tutorial item-->
                     </div>
                 </main>
@@ -130,6 +130,8 @@
     var signature = '';
     var county = '';
     var photopth = '';
+    var t_pths = [];
+    var tutorial_db = document.getElementById('tutorial_db');
 
     function load(){
         var data = {
@@ -157,7 +159,9 @@
                     procession = data.procession;
                     signature = data.signature;
                     photopth = data.photopth;
+                    t_pths = data.t_pths;
                     // console.log("Automatically successes!");
+                    // console.log(t_pths);
                     update();
                 }else{
 
@@ -173,8 +177,6 @@
         })
     }
 
-
-
     function update() {
         // console.log(nickname);
         document.title=nickname + '的主页';
@@ -184,6 +186,45 @@
         if (signature != '' && signature != undefined && signature != null){
             $("#title_signature").text(signature);
         }
+        var i = 0;
+        for(i = 0; i < t_pths.length; ++i){
+            add(i);
+        }
+    }
+
+    function add(i){
+        var num = i + 1;
+        // header
+        var div = document.createElement('div');
+        div.setAttribute('class', 'article-item-box cadn-tracking-statistics');
+        var h4 = document.createElement('h4');
+        var a = document.createElement('a');
+        a.setAttribute('href', '#');
+        a.setAttribute('target', '_blank');
+        var span = document.createElement('span');
+        span.setAttribute('class', 'article-type type-1');
+        span.innerHTML = '匠';
+        a.appendChild(span);
+        var h = document.createElement('h3');
+        h.innerText = '教程名字';
+        a.appendChild(h);
+        h4.appendChild(a);
+        div.appendChild(h4);
+        //footer
+        var div2 = document.createElement('div');
+        div2.setAttribute('class', 'info-box d-flex align-content-center');
+        var p = document.createElement('p');
+        span = document.createElement('span');
+        span.setAttribute('class', 'read-num');
+        span.innerHTML = "喜欢 ";
+        var span2 = document.createElement('span');
+        span2.setAttribute('class', 'num');
+        span2.innerHTML = 0;
+        span.appendChild(span2);
+        p.appendChild(span);
+        div2.appendChild(p);
+        div.appendChild(div2);
+        tutorial_db.appendChild(div);
 
     }
 

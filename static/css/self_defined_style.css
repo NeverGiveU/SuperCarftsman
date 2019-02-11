@@ -93,6 +93,22 @@
     color: #ffa689;
 }
 
+.text_comment{
+    height: 40px;
+    min-height: 40px;
+    max-height: 40px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 100%;
+    resize:none;
+    border: 1px solid #ffddd1;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 15px;
+    background-color: #ffe7e5;
+    color: #ffa689;
+}
+
  .img_upload {
      position: relative;
      display: inline-block;
@@ -128,6 +144,11 @@
     width: 53%;
 }
 
+.editing_board{
+    background-color: white;
+    padding: 20px;
+}
+
 .item0_2{
     width: 60%;
 }
@@ -137,6 +158,29 @@
     width: 43%;
 }
 
+.item0_3{
+    width: 5%;
+}
+.item1_3{
+    width: 100%;
+    vertical-align:middle; text-align:center;
+}
+
 h3{
     color: #988626;
+}
+
+.journal-reward {
+	position: absolute;
+	bottom: 70px;
+	right: 20px;
+	height: 80px;
+	width: 80px;
+	display: block;
+	z-index: 21;
+    position: fixed;
+}
+
+.head_img{
+    width: 50px; height: 50px; border-radius: 25px; float: left; margin-right: 25px;
 }

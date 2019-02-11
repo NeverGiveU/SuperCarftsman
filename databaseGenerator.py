@@ -157,7 +157,7 @@ print('Successfully create table \'comment\'!')
 '''---------------------------------------------------------------------------------------------create table: COMMENT'''
 sql_cmm = '''create table comment(
 id int primary key auto_increment,
-gdatetime datetime,
+gdatetime timestamp not null default current_timestamp,
 context text(1000),
 usr_id int,
 num_like int,

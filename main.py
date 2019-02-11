@@ -616,5 +616,63 @@ def selfhome():
     response = make_response(render_template('selfhome.html'))
     return response
 
+"""=================================================================================================== comment' part """
+"""
+sql_cmm = '''create table comment(
+id int primary key auto_increment,
+gdatetime datetime,
+context text(1000),
+usr_id int,
+num_like int,
+tutorial_id int,
+foreign key(tutorial_id) references tutorial(id),
+reply_id int default -1
+)'''
+"""
+@app.route('/SuperCraftsman/uploadcomment', methods=['post'])
+def uploadcomment():
+    # get user_id
+    ckie = request.cookies.get('cookie')
+    sql = "select * from user where cookie = '%s';" % ckie
+    cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+    state = -1
+    user_id = -1
+    try:
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        if len(data) > 0:
+            state += 1
+            for d in data:
+                user_id = d['id']
+    except:
+        connection.rollback()
+    cursor.close()
+    print(user_id)
+
+    flag = False
+    try:
+        txt_comment = request.form['my_txt_comment']
+        tut_id = request.form['save_id']
+        flag = True
+    except:
+        pass
+
+    if flag:
+        sql_comment = "insert into comment (context, usr_id, num_like, tutorial_id, reply_id) values ('%s', %d, %d,%d, -1)" % (txt_comment, int(user_id), 0, int(tut_id))
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(sql_comment)
+            connection.commit()
+            print('Successfully create the comment!')
+            flag = 1
+        except:
+            connection.rollback()
+            flag = -1
+        cursor.close()
+
+        print(txt_comment)
+        pass
+    return 'success'
+
 if __name__ == '__main__':
     app.run(debug=True)

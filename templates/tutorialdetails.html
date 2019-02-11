@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../static/css/list-b85bd04713.min.css">
     <link rel="stylesheet" href="../static/css/skin-yellow-2eefd34acf.min.css">
     <link rel="stylesheet" href="../static/css/sandalstrap.min.css">
+    <link rel="stylesheet" href="../static/css/demo_heart.css">
 </head>
 <body onload="load();">
 <table style="margin-top: 100px; margin-bottom: 100px; margin-left: 10%; margin-right: 10%; alignment: center; border-collapse:separate; border-spacing:10px;" width="80%" >
@@ -21,9 +22,37 @@
                 <br/>
 
             </td>
+            <!--
+            <td valign="top">
+                <div class="filter-box d-flex align-items-center" >
+
+                </div>
+            </td>
+            -->
+        </tr>
+        <tr>
+            <td>
+                <!--comment-->
+                <div class="editing_board">
+                    <!--1) img 2) textarea 3) submit-btn-->
+                    <form method="post" action="/SuperCraftsman/uploadcomment" enctype="multipart/form-data" id="form_comment">
+                        <table>
+                            <tr>
+                                <td class="item0_3"><a href="#"><img src="../static/src/images/default.png" class="head_img" id="my_head_img" name="my_head_img"/></a></td>
+                                <td class="item1_3"><textarea class="text_comment" id="my_txt_comment" name="my_txt_comment"></textarea></td>
+                            </tr>
+                            <tr><td>
+                                <input type="text" id="save_id" name="save_id" style="display: none;"/>
+                            </td><td>
+                                <input type="submit" id="submit" value="提交评论" style="color: white; background-color: #ff3e2f; border: none; border-radius: 5px;padding: 5px;"/>
+                            </td></tr>
+                        </table>
+                    </form>
+                </div>
+            </td>
         </tr>
     </table>
-
+    <!--<img src="../static/src/images/reward.png" class="journal-reward"/>-->
 </body>
 <script src="../static/js/jquery/jquery-2.2.4.min.js"></script>
 <script type="text/javascript">
@@ -70,12 +99,45 @@
         $("#tutorial_title").text(title);
     }
 
+    var state = -1;
+    var photopth = '';
+
+    function init(){
+        var data = {
+            'state':state,
+        };
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/validation',
+            data:data,
+            dataType:'json',
+            success:function(data){
+                state = data.state;
+                if (state == 2){
+                    photopth = data.photopth;
+                    document.getElementById('my_head_img').src = photopth;
+                    // document.getElementById("submit").style.display="none";
+                }else{
+                    // document.getElementById('my_txt_comment').disabled = true;
+                    // not allowed submit
+                    document.getElementById("submit").style.display="none";
+                }
+                console.log(photopth);
+            },
+            error:function(error){
+            }
+        })
+    }
+
     function load(){
+
         var loc = location.href;
         var n1 = loc.length;//地址的总长度
         var n2 = loc.indexOf("=");//取得=号的位置
         id = decodeURI(loc.substr(n2+1, n1-n2));//从=号后面的内容
+        document.getElementById('save_id').value = id;
         console.log(id);
+        init();
         addtxt(parseInt(id));
     }
     function update(){
@@ -91,7 +153,7 @@
             console.log(content);
 
             var mydiv = document.createElement("div");
-            if (step_count>1){
+            if (step_count>=1){
                 mydiv.setAttribute('class', 'd-flex align-items-center div_step');
             }
             else{

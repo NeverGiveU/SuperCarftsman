@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" href="../static/src/images/logo_t.ico" type="image/x-icon"/>
+    <!--CSS-->
+    <link rel="stylesheet" href="../static/css/content_toolbar.css">
+    <link rel="stylesheet" href="../static/css/self_defined_style.css">
+    <link rel="stylesheet" href="../static/css/list-b85bd04713.min.css">
+    <link rel="stylesheet" href="../static/css/skin-yellow-2eefd34acf.min.css">
+    <link rel="stylesheet" href="../static/css/sandalstrap.min.css">
+</head>
+<body onload="load();">
+<table style="margin-top: 100px; margin-bottom: 100px; margin-left: 10%; margin-right: 10%; alignment: center; border-collapse:separate; border-spacing:10px;" width="80%" >
+        <tr>
+            <td valign="top" width="90%" id="tutorial_steps">
+                <div class="filter-box d-flex align-items-center">
+                    <h3 id="tutorial_title" class="title_text"/>
+                </div>
+                <br/>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+<script src="../static/js/jquery/jquery-2.2.4.min.js"></script>
+<script type="text/javascript">
+    var title = '';
+    var contents = '';
+    var tutorial_steps = document.getElementById('tutorial_steps');
+    var id = 0;
+    function addtxt(no){
+        var num = no;
+        var filename = '../static/tutorials/' + String(num) + '/strut.txt';
+        write_tutorial(filename, num);
+    }
+
+    function write_tutorial(filename, num){
+        var target = "";
+        // console.log(filename);
+        var data = {
+            'filename': filename,
+        };
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/gettutorialtxt',
+            data:data,
+            dataType:'json',
+            success: function(data){
+                if (data.state > 0){
+                    console.log(data.title);
+                    title = data.title;
+                    contents = data.content;
+                    target = "#title_"+num;
+                    // console.log(target);
+                    $(target).html(title);
+                    // add();
+                    update();
+                }else{
+                    alert("您所搜索的教程不存在或者已经被编者删除！");
+                }
+                rendering();
+            }
+        });
+    }
+
+    function rendering(){
+        $("#tutorial_title").text(title);
+    }
+
+    function load(){
+        var loc = location.href;
+        var n1 = loc.length;//地址的总长度
+        var n2 = loc.indexOf("=");//取得=号的位置
+        id = decodeURI(loc.substr(n2+1, n1-n2));//从=号后面的内容
+        console.log(id);
+        addtxt(parseInt(id));
+    }
+    function update(){
+        // console.log(title);
+        document.title="小匠的教程："+title;
+        var img_pth = '';
+        var content = [];
+        var i = 0, j = 0;
+        var step_count = 0;
+
+        for (step_count = 0; step_count < contents.length; ++step_count){
+            content = contents[step_count];
+            console.log(content);
+
+            var mydiv = document.createElement("div");
+            if (step_count>1){
+                mydiv.setAttribute('class', 'd-flex align-items-center div_step');
+            }
+            else{
+                mydiv.setAttribute('class', 'd-flex align-items-center div_step_top');
+            }
+
+            var p = document.createElement('p');//创建p节点
+            p.innerHTML = 'Step ' + step_count;//p节点显示的文字
+            p.setAttribute("class", 'count_step');
+            mydiv.appendChild(p);
+            mydiv.appendChild(document.createElement('br'));
+
+            var table = document.createElement('table');
+            var row = table.insertRow();
+
+            var img_cell = row.insertCell(0);
+            img_cell.setAttribute('class', 'item0_2');
+            img_cell.setAttribute('white-space', 'nowrap');
+            var img = document.createElement('img');
+            img.setAttribute('id', 'img_' + step_count);
+            img_name = '#img_' + step_count;
+            img.setAttribute('class', 'img_step');
+            img.setAttribute('src', '../static/tutorials/'+id+'/src/'+(step_count+1)+'.png');
+            img_cell.appendChild(img);
+            img_cell.appendChild(document.createElement('br'));
+
+            var txt_cell = row.insertCell(1);
+            txt_cell.setAttribute('class', 'item1_2');
+            txt_cell.setAttribute('valign', 'bottom');
+            var text = document.createElement('textarea');
+
+            text.setAttribute("id", "txtup_" + step_count);
+            text.setAttribute("name", "txtup_" + step_count);
+            text.setAttribute("class", 'text_step');
+            for(j = 0; j < content.length; ++j){
+                text.innerHTML += content[j];
+            }
+
+            text.setAttribute("disabled",true);
+            txt_cell.appendChild(text);
+
+            mydiv.appendChild(table);
+
+            // to configure the div for each step
+            tutorial_steps.appendChild(mydiv);
+        }
+    }
+</script>
+</html>

@@ -255,7 +255,7 @@ def uploadtutorial():
                 cursor3.close()
 
                 # newly build dir
-                pth = os.path.join(os.getcwd(), 'tutorials', str(count2+1))
+                pth = os.path.join(os.getcwd(), 'static', 'tutorials', str(count2+1))
                 print(pth)
                 if not os.path.exists(pth):
                     # print("dasda")
@@ -280,7 +280,7 @@ def uploadtutorial():
                 print("found it!")
                 d = data[0]
                 pth = d['srcpth']
-                pth = os.path.join(os.getcwd(), 'tutorials', pth)
+                pth = os.path.join(os.getcwd(), 'static', 'tutorials', pth)
         except:
             connection.rollback()
         cursor.close()
@@ -344,6 +344,46 @@ def uploadtutorial():
             </script>
             </body>
                 """
+
+@app.route('/SuperCraftsman/gettutorialtxt', methods=['GET', 'POST'])
+def gettutorialtxt():
+    filename = request.args.get('filename', "")
+    filename = filename.split("..")[1].split("/")
+    title = ''
+    contents = []
+    state = 0
+    pth = os.path.join(os.getcwd(), filename[1], filename[2], filename[3], filename[4])
+    if os.path.exists(pth):
+        state = 1
+        fhandle = open(pth, 'r', encoding='UTF-8')
+        line = fhandle.readline()
+        title = line
+        line = fhandle.readline()
+        contents = []
+        content = []
+        while line:
+            if line == '<>\n':
+                if content != []:
+                    contents.append(content)
+                    content = []
+                pass
+            else:
+                if line != '\n':
+                    content.append(line)
+
+            line = fhandle.readline()
+        fhandle.close()
+        # print(contents)
+    return simplejson.dumps({
+        'state': state,
+        'title': title,
+        'content': contents
+    })
+
+@app.route('/SuperCraftsman/tutorialdetails', methods=['GET', 'POST'])
+def tutorialdetails():
+    response = make_response(render_template('tutorialdetails.html'))
+    return response
 
 """===================================================================================================== users' part """
 @app.route('/SuperCraftsman/validation', methods=['GET', 'POST'])

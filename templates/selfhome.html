@@ -55,9 +55,9 @@
                         <div class="profile-intro d-flex">
                             <!--nick name and the head image-->
                             <div class="avatar-box d-flex justify-content-center flex-column">
-                                <a href="#"><img src="#" class="avatar_pic" id="profile_head"/></a>
+                                <a href="#"><img src="{{url_for('selfinfo')}}" class="avatar_pic" id="profile_head"/></a>
                                 <p class="name csdn-tracking-statistics tracking-click" data-mod="popu_379" style="float: left;">
-                                    <a href="#" target="_blank" class="" id="profile_nickname" class="uid">萧班</a>
+                                    <a href="{{url_for('selfinfo')}}" target="_blank" class="" id="profile_nickname" class="uid">萧班</a>
                                 </p>
                             </div>
                         </div>
@@ -191,21 +191,77 @@
             add(i);
         }
     }
-
     function add(i){
-        var num = i + 1;
+        var num = t_pths[i];
+        var filename = '../static/tutorials/' + String(num) + '/strut.txt';
+        write_tutorial(filename, num);
+    }
+
+    function write_tutorial(filename, num){
+        var target = "";
+        console.log(filename);
+        var data = {
+            'filename': filename,
+        };
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/gettutorialtxt',
+            data:data,
+            dataType:'json',
+            success: function(data){
+                if (data.state > 0){
+                    console.log(data.title);
+                    add_component(num);
+                    var title = data.title;
+                    var content = data.content;
+                    target = "#title_"+num;
+                    // console.log(target);
+                    $(target).html(title);
+                }
+            }
+        });
+    }
+
+    function add_component(num){
+
         // header
         var div = document.createElement('div');
         div.setAttribute('class', 'article-item-box cadn-tracking-statistics');
         var h4 = document.createElement('h4');
         var a = document.createElement('a');
-        a.setAttribute('href', '#');
+        // a.setAttribute('href', "{{url_for('tutorialdetails')}}");
         a.setAttribute('target', '_blank');
+        a.setAttribute("name", ""+num);
+
+        a.onclick=function(){
+
+            // console.log("dadad");
+            // alert("xxx");
+            var name = parseInt(this.name);
+            console.log(name);
+            location.href="tutorialdetails?"+"tutorial_no="+encodeURI(num);
+            var data = {
+                'tutorial_no': name,
+            };
+            $.ajax({
+               type: 'GET',
+               url: '/../SuperCraftsman/tutorialdetails',
+               data: data,
+               datatype: 'json',
+               success: function(){
+                   console.log("success");
+               },
+               error: function(){
+                   console.log("fail");
+               }
+            });
+        }
         var span = document.createElement('span');
         span.setAttribute('class', 'article-type type-1');
         span.innerHTML = '匠';
         a.appendChild(span);
         var h = document.createElement('h3');
+        h.setAttribute('id', "title_" + num);
         h.innerText = '教程名字';
         a.appendChild(h);
         h4.appendChild(a);
@@ -225,7 +281,6 @@
         div2.appendChild(p);
         div.appendChild(div2);
         tutorial_db.appendChild(div);
-
     }
 
     window.onload = function(){

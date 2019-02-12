@@ -31,7 +31,7 @@
             -->
         </tr>
         <tr>
-            <td>
+            <td id="comment_board">
                 <!--comment-->
                 <div class="editing_board">
                     <!--1) img 2) textarea 3) submit-btn-->
@@ -49,6 +49,11 @@
                         </table>
                     </form>
                 </div>
+            </td>
+        </tr>
+        <tr>
+            <td >
+
             </td>
         </tr>
     </table>
@@ -79,7 +84,7 @@
             dataType:'json',
             success: function(data){
                 if (data.state > 0){
-                    console.log(data.title);
+                    // console.log(data.title);
                     title = data.title;
                     contents = data.content;
                     target = "#title_"+num;
@@ -122,7 +127,7 @@
                     // not allowed submit
                     document.getElementById("submit").style.display="none";
                 }
-                console.log(photopth);
+                // console.log(photopth);
             },
             error:function(error){
             }
@@ -130,15 +135,15 @@
     }
 
     function load(){
-
         var loc = location.href;
         var n1 = loc.length;//地址的总长度
         var n2 = loc.indexOf("=");//取得=号的位置
         id = decodeURI(loc.substr(n2+1, n1-n2));//从=号后面的内容
         document.getElementById('save_id').value = id;
-        console.log(id);
+        // console.log(id);
         init();
         addtxt(parseInt(id));
+        addcomment(id);
     }
     function update(){
         // console.log(title);
@@ -180,6 +185,8 @@
             img_cell.appendChild(img);
             img_cell.appendChild(document.createElement('br'));
 
+            //var div = document.createElement('div');
+            //div.setAttribute('contenteditable',true);
             var txt_cell = row.insertCell(1);
             txt_cell.setAttribute('class', 'item1_2');
             txt_cell.setAttribute('valign', 'bottom');
@@ -193,6 +200,7 @@
             }
 
             text.setAttribute("disabled",true);
+            //div.appendChild(text);
             txt_cell.appendChild(text);
 
             mydiv.appendChild(table);
@@ -200,6 +208,80 @@
             // to configure the div for each step
             tutorial_steps.appendChild(mydiv);
         }
+    }
+
+    function addcomment(id){
+        var data = {
+            'id': id,
+        };
+        console.log("adasa--"+id);
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/addcomment',
+            data:data,
+            dataType:'json',
+            success:function(data){
+                // console.log(data.state);
+                if (data.state > 0){
+                    var usr_ids = data.usr_ids;
+                    var cmm_ids = data.cmm_ids;
+                    var date_stamps = data.date_stamps;
+                    var comments = data.comments;
+                    var usr_acounts = data.usr_acounts;
+                    var usr_photopths = data.usr_photopths;
+
+                    var length = usr_ids.length;
+                    var usr_id = 0;
+                    var cmm_id = 0;
+                    var date_stamp = '';
+                    var comment = '';
+                    var usr_acount = '';
+                    var usr_photopth = '';
+
+                    for(var i = 0; i < length; ++i){
+                        usr_id = usr_ids[i];
+                        cmm_id = cmm_ids[i];
+                        comment = comments[i];
+                        date_stamp = date_stamps[i];
+                        usr_acount = usr_acounts[i];
+                        usr_photopth = usr_photopths[i];
+                        console.log(usr_photopth);
+
+                        // html
+                        var div = document.createElement('div');
+                        div.setAttribute('class', 'commenting_board');
+                        var table = document.createElement('table');
+                        var row = table.insertRow();
+
+                        var img_cell = row.insertCell(0);
+                        img_cell.setAttribute('class', 'item0_3');
+                        img_cell.setAttribute('white-space', 'nowrap');
+                        var a = document.createElement('a');
+                        a.setAttribute('href', '#');                        // set <a/>'s attribute
+                        var img = document.createElement('img');
+                        img.setAttribute('id', 'cmm_head_img_' + (i+1));
+                        img.setAttribute('class', 'head_img');
+                        img.setAttribute('src', usr_photopth);
+                        a.appendChild(img);
+                        img_cell.appendChild(a);
+                        img_cell.appendChild(document.createElement('br'));
+
+                        var txt_cell = row.insertCell(1);
+                        txt_cell.setAttribute('class', 'item1_3');
+                        //var div = document.createElement('div');
+                        //div.contenteditable=true;
+                        var text = document.createElement('textarea');
+                        text.setAttribute("class", 'text_comment2');
+                        text.setAttribute("disabled", true);
+                        text.innerHTML = comment;
+                        txt_cell.appendChild(text);
+                        div.appendChild(table);
+                        document.getElementById('comment_board').appendChild(div);
+                    }
+                }
+            }
+
+        });
     }
 </script>
 </html>

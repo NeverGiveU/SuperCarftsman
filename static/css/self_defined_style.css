@@ -109,6 +109,20 @@
     color: #ffa689;
 }
 
+.text_comment2{
+    width: 100%;
+    overflow: auto;
+    word-break: break-all;
+    resize:none;
+    border: 1px solid #ecffff;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 15px;
+    background-color: #edf7f9;
+    color: #477dd4;
+    overflow-y:visible;
+}
+
  .img_upload {
      position: relative;
      display: inline-block;
@@ -145,6 +159,12 @@
 }
 
 .editing_board{
+    background-color: white;
+    padding: 20px;
+}
+
+.commenting_board{
+    border-top: 1px solid #d0d0d0;
     background-color: white;
     padding: 20px;
 }

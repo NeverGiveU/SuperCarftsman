@@ -674,5 +674,64 @@ def uploadcomment():
         pass
     return 'success'
 
+@app.route('/SuperCraftsman/addcomment', methods=['GET'])
+def addcomment():
+    state = -1
+    cmm_id = request.args.get('id', 0)
+    print(cmm_id)
+    sql = "select * from comment where tutorial_id = %d;" % (int(cmm_id))
+    cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+    state += 1
+    usr_ids = []
+    usr_accounts = []
+    usr_photopths = []
+    cmm_ids = []
+    comments = []
+    date_stamps = []
+
+    try:
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        if len(data) > 0:
+            state = 1
+            for d in data:
+                usr_ids.append(d['usr_id'])
+                cmm_ids.append(d['id'])
+                comments.append(d['context'])
+                date_stamps.append(str(d['gdatetime']))
+            pass
+    except:
+        connection.rollback()
+
+    for usr_id in usr_ids:
+        usr_account = ''
+        usr_photopth = ''
+        sql = "select * from user where id = %d;" % int(usr_id)
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+
+        try:
+            cursor.execute(sql)
+            data = cursor.fetchall()
+            if len(data) > 0:
+                usr_account = data[0]['account']
+                usr_photopth = data[0]['photopth']
+                pass
+        except:
+            connection.rollback()
+        usr_accounts.append(usr_account)
+        usr_photopths.append(usr_photopth)
+        pass
+    print(usr_photopths)
+    return simplejson.dumps({
+        'state': state,
+
+        'usr_ids': usr_ids,
+        'usr_acounts': usr_accounts,
+        'usr_photopths': usr_photopths,
+        'cmm_ids': cmm_ids,
+        'comments': comments,
+        'date_stamps': date_stamps
+    })
+
 if __name__ == '__main__':
     app.run(debug=True)

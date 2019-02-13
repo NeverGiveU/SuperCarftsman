@@ -474,7 +474,8 @@ def validation():
                 'procession': procession,
                 'signature': signature,
                 'photopth': photopth,
-                't_pths': t_pths
+                't_pths': t_pths,
+                'user_id': user_id
             })
         pass
     return 'SUCCESS'
@@ -732,6 +733,42 @@ def addcomment():
         'comments': comments,
         'date_stamps': date_stamps
     })
+
+@app.route('/SuperCraftsman/uploadreply', methods=['post'])
+def uploadreply():
+    txt_reply = ''
+    to_id = 0
+    from_id = 0
+    usr_id = 0
+    try:
+        txt_reply = request.form['txt_reply']
+        hidden_info = request.form['hidden_info']
+        try:
+            to_id = int(hidden_info.split('-')[1])
+            from_id = int(hidden_info.split('-')[3])
+            usr_id = int(hidden_info.split('-')[2])
+        except:
+            pass
+    except:
+        pass
+    # print(txt_reply)
+    # print(hidden_info)
+    if from_id == 0:
+        print("nothing to do")
+    else:
+        sql_comment = "insert into comment (context, usr_id, num_like, tutorial_id, reply_id) values ('%s', %d, %d,%d, %d)" % (txt_reply, usr_id, 0, from_id, to_id)
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(sql_comment)
+            connection.commit()
+            # print('Successfully create the comment!')
+        except Exception as e:
+            # print(e)
+            connection.rollback()
+        cursor.close()
+
+        pass
+    return 'success'
 
 if __name__ == '__main__':
     app.run(debug=True)

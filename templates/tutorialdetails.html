@@ -114,7 +114,7 @@
     }
 
     var state = -1;
-    var photopth = '';
+    var photopth = '../static/src/images/default.png';
 
     function init(){
         var data = {
@@ -142,13 +142,38 @@
             }
         })
     }
-
+    var cur_id = 0;
     function load(){
+        // validate
+        var data = {
+            'state':state,
+        };
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/validation',
+            data:data,
+            dataType:'json',
+            success:function(data){
+                state = data.state;
+                if (state == 2){
+                    cur_id = data.user_id;
+                    update();
+                }else{
+
+                }
+                console.log(photopth);
+            },
+            error:function(error){
+
+            }
+        });
+        // end validation
         var loc = location.href;
         var n1 = loc.length;//地址的总长度
         var n2 = loc.indexOf("=");//取得=号的位置
         id = decodeURI(loc.substr(n2+1, n1-n2));//从=号后面的内容
         document.getElementById('save_id').value = id;
+
         // console.log(id);
         init();
         addtxt(parseInt(id));
@@ -310,29 +335,100 @@
                         btn.type = 'button';
                         btn.value = '展开';
                         btn.setAttribute('class', 'btn_open');
+                        btn.setAttribute('id', 'btn_'+cmm_id);
                         btn.onclick = function() {
-                            // console.log(btn.type);
-
                             var flag_id = parseInt($(this).parent().find('input')[0].value);
-                            console.log(flag_id);
-                            console.log(open_flags);
+                            // console.log(flag_id);
+                            // console.log(open_flags);
                             if (open_flags[flag_id] == false){
                                 // open it
+                                for(var jj = 0; jj < open_flags.length; ++jj){
+                                    if (open_flags[jj]==true){
+                                        open_flags[jj]=false;
+                                        $(this).val('展开');
+                                        var target = '#reply_'+jj;
+                                        $(target).css('display','none');
+                                    }
+                                }
                                 $(this).val('收起');
+                                var target = '#reply_'+flag_id;
+                                $(target).css('display','block');
                                 open_flags[flag_id] = true;
                             }else{
                                 // close it
                                 $(this).val('展开');
+                                var target = '#reply_'+flag_id;
+                                $(target).css('display','none');
                                 open_flags[flag_id] = false;
                             }
 
                         };
                         cell.appendChild(btn);
 
+                        var div1 = document.createElement('div');
+                        div1.setAttribute('class', 'text_hidden');
+                        div1.setAttribute('id', 'reply_'+cmm_id);
                         // replies
 
                         // editing replies
+                        var div1_1 = document.createElement('div');
+                        div1_1.setAttribute('class', 'editing_board_reply');
+                        var form = document.createElement('form');
+                        form.action = '/SuperCraftsman/uploadreply';
+                        form.method = 'post';
+                        form.enctype = 'multipart/form-data';
+                        form.setAttribute('id', "form_reply_"+cmm_id);
+                        var table_2 = document.createElement('table');
+                        var row_2 = table_2.insertRow();
+                        var cell_2_1 = row_2.insertCell(0);
+                        cell_2_1.setAttribute('class', 'item0_3');
+                        var a = document.createElement('a');
+                        a.setAttribute('href', '#');
+                        var img = document.createElement('img');
+                        img.setAttribute('class', 'head_img');
+                        img.setAttribute('name', 'head_img');
+                        img.setAttribute('src', photopth);
+                        a.appendChild(img);
+                        cell_2_1.appendChild(a);
+                        var cell_2_2 = row_2.insertCell(1);
+                        cell_2_2.setAttribute('class', 'item1_3');
+                        var textarea = document.createElement('textarea');
+                        textarea.setAttribute('class', 'text_comment');
+                        textarea.setAttribute('id', 'txt_reply_'+cmm_id);
+                        textarea.setAttribute('name', 'txt_reply');
+                        cell_2_2.appendChild(textarea);
 
+                        var row_2 = table_2.insertRow();
+                        var cell_2_1 = row_2.insertCell(0);
+                        var cell_2_2 = row_2.insertCell(1);
+                        var hidden = document.createElement('input');
+                        hidden.setAttribute('name', 'hidden_info');
+                        hidden.type = 'text';
+                        hidden.value = '#txt_reply_'+cmm_id+'-'+usr_id+'-'+cur_id+'-'+id;
+                        cell_2_2.appendChild(hidden);
+                        var reply = document.createElement('input');
+                        reply.type = 'submit';
+                        reply.setAttribute('id', 'reply');
+                        reply.value = '回复';
+                        reply.setAttribute('class', 'submit_btn');
+                        reply.onclick = function(){
+                            var flag = $(this).parent().find('input')[0].value;
+                            // console.log(flag);
+                            var contt = $(flag.split('-')[0]).val();
+                            // console.log(contt);
+                            if (contt.length <= 0 || cur_id == 0){
+                                alert("很抱歉，回复空白无效或您尚未登录！");
+                                return false;
+                            }
+                            else{
+                                return true;}
+                        };
+                        cell_2_2.appendChild(reply);
+
+                        form.appendChild(table_2);
+                        div1_1.appendChild(form);
+                        div1.appendChild(div1_1);
+                        cell.appendChild(div1);
                         div.appendChild(table);
                         document.getElementById('comment_board').appendChild(div);
                     }

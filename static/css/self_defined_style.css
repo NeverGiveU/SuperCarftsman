@@ -180,7 +180,13 @@ overflow-y: auto;
 
 .editing_board{
     background-color: white;
-    padding: 20px;
+    padding: 10px;
+    width: 100%;
+}
+
+.editing_board_reply{
+    background-color: white;
+    width: 100%;
 }
 
 .commenting_board{
@@ -244,6 +250,10 @@ h3{
     border: none;
     border-radius: 5px;
 
+}
+
+.submit_btn{
+    color: white; background-color: #ff3e2f; border: none; border-radius: 5px;padding: 5px;
 }
 
 .text_hidden{

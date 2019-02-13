@@ -53,7 +53,15 @@
         </tr>
         <tr>
             <td >
-
+                <!--last/next page-->
+                <!--
+                <div class="qt-pagination" style="margin-bottom: 30px;">
+                    <a href="#" style="padding: 10px;">上一页</a>
+                    <a href="#" style="padding: 10px;">01</a>
+                    <a href="#" style="padding: 10px;" class="on">02</a>
+                    <a href="#" style="padding: 10px;">下一页</a>
+                </div>
+                -->
             </td>
         </tr>
     </table>
@@ -65,6 +73,7 @@
     var contents = '';
     var tutorial_steps = document.getElementById('tutorial_steps');
     var id = 0;
+    var open_flags = [];
     function addtxt(no){
         var num = no;
         var filename = '../static/tutorials/' + String(num) + '/strut.txt';
@@ -245,12 +254,13 @@
                         date_stamp = date_stamps[i];
                         usr_acount = usr_acounts[i];
                         usr_photopth = usr_photopths[i];
-                        console.log(usr_photopth);
+                        console.log(date_stamp);
 
                         // html
                         var div = document.createElement('div');
                         div.setAttribute('class', 'commenting_board');
                         var table = document.createElement('table');
+                        // first row
                         var row = table.insertRow();
 
                         var img_cell = row.insertCell(0);
@@ -268,19 +278,66 @@
 
                         var txt_cell = row.insertCell(1);
                         txt_cell.setAttribute('class', 'item1_3');
-                        //var div = document.createElement('div');
-                        //div.contenteditable=true;
-                        var text = document.createElement('textarea');
-                        text.setAttribute("class", 'text_comment2');
-                        text.setAttribute("disabled", true);
-                        text.innerHTML = comment;
-                        txt_cell.appendChild(text);
+                        var div2 = document.createElement('div');
+                        div2.setAttribute('class', 'test-textarea');
+                        div2.innerHTML = comment;
+                        txt_cell.appendChild(div2);
+                        // second row
+                        var row2 = table.insertRow();
+                        var cell = row2.insertCell(0);
+
+                        var cell = row2.insertCell(1);
+
+                        var text_hidden = document.createElement('input');
+                        text_hidden.setAttribute('type', 'text');
+                        text_hidden.setAttribute('id', 'text_hidden');
+                        //text_hidden.setAttribute('class', 'text_hidden');
+                        text_hidden.value = cmm_id;
+                        cell.appendChild(text_hidden);
+
+                        var h5 = document.createElement('h5');
+                        h5.setAttribute('id', 'cmm_id');
+                        h5.innerHTML = date_stamp;
+                        h5.setAttribute('class', 'h5_time_stamp');
+                        cell.appendChild(h5);
+                        // open_flags.append()
+                        // button: if clicked, display the blocked
+                        var jj = 0;
+                        for(jj = open_flags.length; jj <= cmm_id; ++jj)
+                            open_flags[jj] = false;
+
+                        var btn = document.createElement('input');
+                        btn.type = 'button';
+                        btn.value = '展开';
+                        btn.setAttribute('class', 'btn_open');
+                        btn.onclick = function() {
+                            // console.log(btn.type);
+
+                            var flag_id = parseInt($(this).parent().find('input')[0].value);
+                            console.log(flag_id);
+                            console.log(open_flags);
+                            if (open_flags[flag_id] == false){
+                                // open it
+                                $(this).val('收起');
+                                open_flags[flag_id] = true;
+                            }else{
+                                // close it
+                                $(this).val('展开');
+                                open_flags[flag_id] = false;
+                            }
+
+                        };
+                        cell.appendChild(btn);
+
+                        // replies
+
+                        // editing replies
+
                         div.appendChild(table);
                         document.getElementById('comment_board').appendChild(div);
                     }
                 }
             }
-
         });
     }
 </script>

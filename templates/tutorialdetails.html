@@ -44,7 +44,7 @@
                             <tr><td>
                                 <input type="text" id="save_id" name="save_id" style="display: none;"/>
                             </td><td>
-                                <input type="submit" id="submit" value="提交评论" style="color: white; background-color: #ff3e2f; border: none; border-radius: 5px;padding: 5px;"/>
+                                <input type="submit" id="submit" value="提交评论" style="color: white; background-color: #ff3e2f; border: none; border-radius: 5px;padding: 5px;" onclick="return verify();" />
                             </td></tr>
                         </table>
                     </form>
@@ -74,6 +74,8 @@
     var tutorial_steps = document.getElementById('tutorial_steps');
     var id = 0;
     var open_flags = [];
+    var reply_flags = [];
+    var submit_allowable = false;
     function addtxt(no){
         var num = no;
         var filename = '../static/tutorials/' + String(num) + '/strut.txt';
@@ -115,7 +117,14 @@
 
     var state = -1;
     var photopth = '../static/src/images/default.png';
+    function verify(){
 
+        var value2 = document.getElementById("my_txt_comment").value;
+        if (value2 == ''){
+            return false;
+        }
+        return submit_allowable;
+    }
     function init(){
         var data = {
             'state':state,
@@ -128,12 +137,14 @@
             success:function(data){
                 state = data.state;
                 if (state == 2){
+                    submit_allowable = true;
                     photopth = data.photopth;
                     document.getElementById('my_head_img').src = photopth;
                     // document.getElementById("submit").style.display="none";
                 }else{
                     // document.getElementById('my_txt_comment').disabled = true;
                     // not allowed submit
+                    submit_allowable = false;
                     document.getElementById("submit").style.display="none";
                 }
                 // console.log(photopth);
@@ -243,7 +254,69 @@
             tutorial_steps.appendChild(mydiv);
         }
     }
+    function addreply(flag_id){
+        var replies = [];
+        var reply_times = [];
+        var usr_ids = [];
+        var usr_photopths = [];
+        var date_stamps = [];
+        var data = {
+            'reply_id': flag_id, // $("#reply_"+flag_id)
+        };
+        $.ajax({
+            type: 'GET',
+            url: '/../SuperCraftsman/getreply',
+            data: data,
+            dataType: 'json',
+            success: function (data) {
+                // console.log(data.no);
+                if (data.state == 1) {
+                    replies = data.replies;
+                    reply_times = data.date_stamps;
+                    usr_ids = data.usr_ids;
+                    usr_photopths = data.usr_photopths;
+                    // console.log(replies);
+                    var div1 = document.getElementById('reply_'+flag_id);
+                    for(var k = 0; k < replies.length; ++k){
+                        // the contents
+                        var div1_2 = document.createElement('div');
+                        div1_2.setAttribute('class', 'commenting_board');
 
+                        var table = document.createElement('table');
+                        var row = table.insertRow();
+
+                        var img_cell = row.insertCell(0);
+                        img_cell.setAttribute('class', 'item0_3');
+                        img_cell.setAttribute('white-space', 'nowrap');
+                        var img = document.createElement('img');
+                        img.setAttribute('class', 'head_img');
+                        img.setAttribute('src', usr_photopths[k]);
+                        img_cell.appendChild(img);
+                        img_cell.appendChild(document.createElement('br'));
+
+                        var txt_cell = row.insertCell(1);
+                        txt_cell.setAttribute('class', 'item1_3');
+                        var div2 = document.createElement('div');
+                        div2.setAttribute('class', 'test-textarea');
+                        div2.innerHTML = replies[k];
+                        txt_cell.appendChild(div2);
+
+                        // second row
+                        var row = table.insertRow();
+                        var cell = row.insertCell(0);
+                        cell = row.insertCell(1);
+                        var h5 = document.createElement('h5');
+                        h5.setAttribute('class', 'h5_time_stamp');
+                        h5.innerHTML = reply_times[k];
+                        cell.appendChild(h5);
+                        div1_2.appendChild(table);
+
+                        div1.appendChild(div1_2);
+                    }
+                }
+            }
+        });
+    }
     function addcomment(id){
         var data = {
             'id': id,
@@ -279,7 +352,7 @@
                         date_stamp = date_stamps[i];
                         usr_acount = usr_acounts[i];
                         usr_photopth = usr_photopths[i];
-                        console.log(date_stamp);
+                        // console.log(date_stamp);
 
                         // html
                         var div = document.createElement('div');
@@ -316,7 +389,7 @@
                         var text_hidden = document.createElement('input');
                         text_hidden.setAttribute('type', 'text');
                         text_hidden.setAttribute('id', 'text_hidden');
-                        //text_hidden.setAttribute('class', 'text_hidden');
+                        text_hidden.setAttribute('class', 'text_hidden');
                         text_hidden.value = cmm_id;
                         cell.appendChild(text_hidden);
 
@@ -328,19 +401,28 @@
                         // open_flags.append()
                         // button: if clicked, display the blocked
                         var jj = 0;
-                        for(jj = open_flags.length; jj <= cmm_id; ++jj)
+                        for(jj = open_flags.length; jj <= cmm_id; ++jj){
                             open_flags[jj] = false;
+                            reply_flags[jj] = false;
+                        }
 
                         var btn = document.createElement('input');
                         btn.type = 'button';
                         btn.value = '展开';
                         btn.setAttribute('class', 'btn_open');
                         btn.setAttribute('id', 'btn_'+cmm_id);
+                        var fflag_id;
                         btn.onclick = function() {
                             var flag_id = parseInt($(this).parent().find('input')[0].value);
+                            fflag_id = flag_id;
                             // console.log(flag_id);
                             // console.log(open_flags);
                             if (open_flags[flag_id] == false){
+                                // if replies updation required
+                                if (reply_flags[flag_id] == false){
+                                    addreply(flag_id);
+                                    reply_flags[flag_id] = true;
+                                }
                                 // open it
                                 for(var jj = 0; jj < open_flags.length; ++jj){
                                     if (open_flags[jj]==true){
@@ -368,7 +450,6 @@
                         var div1 = document.createElement('div');
                         div1.setAttribute('class', 'text_hidden');
                         div1.setAttribute('id', 'reply_'+cmm_id);
-                        // replies
 
                         // editing replies
                         var div1_1 = document.createElement('div');
@@ -403,8 +484,9 @@
                         var cell_2_2 = row_2.insertCell(1);
                         var hidden = document.createElement('input');
                         hidden.setAttribute('name', 'hidden_info');
+                        hidden.setAttribute('class', 'text_hidden');
                         hidden.type = 'text';
-                        hidden.value = '#txt_reply_'+cmm_id+'-'+usr_id+'-'+cur_id+'-'+id;
+                        hidden.value = '#txt_reply_'+cmm_id+'-'+cmm_id+'-'+cur_id+'-'+id;
                         cell_2_2.appendChild(hidden);
                         var reply = document.createElement('input');
                         reply.type = 'submit';
@@ -413,9 +495,7 @@
                         reply.setAttribute('class', 'submit_btn');
                         reply.onclick = function(){
                             var flag = $(this).parent().find('input')[0].value;
-                            // console.log(flag);
                             var contt = $(flag.split('-')[0]).val();
-                            // console.log(contt);
                             if (contt.length <= 0 || cur_id == 0){
                                 alert("很抱歉，回复空白无效或您尚未登录！");
                                 return false;
@@ -424,9 +504,9 @@
                                 return true;}
                         };
                         cell_2_2.appendChild(reply);
-
                         form.appendChild(table_2);
                         div1_1.appendChild(form);
+
                         div1.appendChild(div1_1);
                         cell.appendChild(div1);
                         div.appendChild(table);

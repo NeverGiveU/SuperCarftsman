@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="../static/css/skin-yellow-2eefd34acf.min.css">
     <link rel="stylesheet" href="../static/css/sandalstrap.min.css">
 </head>
-
+<body>
 <form method="post" action="/SuperCraftsman/uploadtutorial" enctype="multipart/form-data" id="form_tut">
     <table style="margin-top: 100px; margin-bottom: 100px; margin-left: 10%; margin-right: 10%; alignment: center; border-collapse:separate; border-spacing:10px;" width="80%" >
         <tr>
@@ -26,7 +26,23 @@
                     <a>新建步骤 <b>+</b></a>
                 </div>
                 <br/>
+                <div id="new_classify_btn" style="" class="filter-box d-flex align-items-center" onmouseover="this.className='hover_div d-flex align-items-center'" onmouseout="this.className='filter-box d-flex align-items-center'">
+                    <select style="border: none; font-size: 15px; color: #705f37;">
 
+                        <option value="模型">模型</option>
+                        <option value="手绘">手绘</option>
+                        <option value="板绘">板绘</option>
+                        <option value="纸艺">纸艺</option>
+                        <option value="布艺">布艺</option>
+                        <option value="橡皮章">橡皮章</option>
+                        <option value="科技教育">科技教育</option>
+                        <option value="软件使用">软件使用</option>
+                        <option value="美食烘焙">美食烘焙</option>
+                        <option value="美妆护肤">美妆护肤</option>
+                        <option value="其他类别">其他类别</option>
+                    </select>
+                </div>
+                <br/>
                 <div class="filter-box d-flex align-items-center" onmouseover="this.className='hover_div d-flex align-items-center'" onmouseout="this.className='filter-box d-flex align-items-center'">
                     <button id="save_submit_btn" type="submit" class="btn original-btn" id="submit" onclick="return check();">SAVE</button>
                 </div>

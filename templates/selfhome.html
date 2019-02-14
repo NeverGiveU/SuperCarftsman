@@ -223,7 +223,6 @@
     }
 
     function add_component(num){
-
         // header
         var div = document.createElement('div');
         div.setAttribute('class', 'article-item-box cadn-tracking-statistics');
@@ -266,6 +265,13 @@
         a.appendChild(h);
         h4.appendChild(a);
         div.appendChild(h4);
+        // add an image of the tutorial
+        var img = document.createElement('img');
+        img.setAttribute('src', '../static/tutorials/'+num+'/src/1.png');
+        img.setAttribute('class', 'self_home_img');
+        var br = document.createElement('br');
+        div.appendChild(br);
+        div.appendChild(img);
         //footer
         var div2 = document.createElement('div');
         div2.setAttribute('class', 'info-box d-flex align-content-center');

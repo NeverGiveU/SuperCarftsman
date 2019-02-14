@@ -195,6 +195,10 @@ overflow-y: auto;
     padding: 20px;
 }
 
+.self_home_img{
+    width: 50%;
+}
+
 .item0_2{
     width: 60%;
 }
@@ -259,4 +263,37 @@ h3{
 .text_hidden{
     display: none;
 }
+.fense{ color:#ff6699;}
 
+.sgk-gerenzhuye-list{margin-right: -22px}
+.sgk-gerenzhuye-jc-one{ width:228px; padding-bottom:15px; background:#fff; box-shadow:1px 1px 5px #cccccc; float:left; margin:22px 22px 0 0; position:relative;}
+.sgk-gerenzhuye-jc-one-info{ width:208px; padding:0 10px;}
+
+.size24{ font-size:24px;}
+.size14{ font-size:14px;}
+.size16{ font-size:16px;}
+.size20{ font-size:20px;}
+.size18{ font-size:18px;}
+.size26{ font-size:26px;}
+.size28{ font-size:28px;}
+
+.fixed:after { content: "."; display: block; clear: both; height: 0; visibility: hidden; }
+
+.width980{ width:980px; margin:0 auto;}
+
+.jc-hot{ margin:50px auto 0;}
+.jc-hot-tit a{ float:right;}
+.jc-hot-tit{ width:978px; background:url(http://imgs.shougongke.com/Public/index/images/jc_bg.gif) no-repeat bottom; padding:0 0 10px 0; margin-bottom:9px;}
+.jc-hot-tit a:hover{ background:#FF6699; color:#fff;}
+/***教程添加用户头像***/
+.sgk-jc-writer{ margin-top:22px;}
+.sgk-jc-writer dl{ float:right; margin-right:12px;}
+.sgk-jc-writer dl dt{ float:right;}
+.sgk-jc-writer dl dd a{ line-height:32px; padding-right:12px;}
+.sgk-jc-writer dl dd{ float:right; padding-right: 5px;}
+.sgk-jc-writer dl dd a{overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 130px; display: inline-block;  color: #555;}
+.sgk-jc-writer dl dd.daren{ background:url(http://imgs.shougongke.com/Public/index/images/common/v.png) no-repeat left center; padding:0 5px 0 25px; max-width: 170px; box-sizing: border-box;overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
+.sgk-jc-writer dl dd.daren a{overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px; display: inline-block;}
+
+.jc-tit{ height:20px; line-height:22px; overflow:hidden; font-weight:normal; margin:10px 0 10px 0;}
+.jc-tit a:hover{ color:#ff6699;}

@@ -385,6 +385,69 @@ def tutorialdetails():
     response = make_response(render_template('tutorialdetails.html'))
     return response
 
+@app.route('/SuperCraftsman/gettutorials', methods=['GET', 'POST'])
+def gettutorials():
+    state = request.args.get('state', 0)
+    sql = "select * from tutorial"
+    cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+
+    tut_ids = []
+    host_ids = []
+    host_names = []
+    host_photos = []
+    titles = []
+
+    try:
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        # print(data)
+        if len(data) > 0:
+            if state == -2:
+                r = min(4, len(data))
+                print(r)
+            if state == -1:
+                r = len(data)
+                print(r)
+            state = 1
+            r = min(4, len(data))
+            # get at most 4
+            data.reverse()
+            for i in range(r):
+                d = data[i]
+                tut_ids.append(d['id'])
+                host_ids.append(d['host_id'])
+                titles.append(d['title'])
+            pass
+    except:
+        print('fail1')
+        connection.rollback()
+    cursor.close()
+
+    #print(host_ids)
+    if state == 1:
+        for host_id in host_ids:
+            sql = "select * from user where id = %d"%(host_id)
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+            try:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+                if len(data) > 0:
+                    host_names.append(data[0]['nickname'])
+                    host_photos.append(data[0]['photopth'])
+            except:
+                print('fail2')
+                connection.rollback()
+            cursor.close()
+    #print(host_photos)
+    return simplejson.dumps({
+        'state': state,
+        'tut_ids': tut_ids,
+        'host_ids': host_ids,
+        'host_names': host_names,
+        'host_photos': host_photos,
+        'titles': titles
+    })
+
 """===================================================================================================== users' part """
 @app.route('/SuperCraftsman/validation', methods=['GET', 'POST'])
 def validation():
@@ -680,7 +743,7 @@ def addcomment():
     state = -1
     cmm_id = request.args.get('id', 0)
     print(cmm_id)
-    sql = "select * from comment where tutorial_id = %d;" % (int(cmm_id))
+    sql = "select * from comment where tutorial_id = %d and reply_id = %d;" % (int(cmm_id), -1)
     cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
     state += 1
     usr_ids = []
@@ -744,9 +807,9 @@ def uploadreply():
         txt_reply = request.form['txt_reply']
         hidden_info = request.form['hidden_info']
         try:
-            to_id = int(hidden_info.split('-')[1])
-            from_id = int(hidden_info.split('-')[3])
-            usr_id = int(hidden_info.split('-')[2])
+            to_id = int(hidden_info.split('-')[1])  # reply to which comment
+            from_id = int(hidden_info.split('-')[3])# for which tutorial
+            usr_id = int(hidden_info.split('-')[2]) # from which user
         except:
             pass
     except:
@@ -769,6 +832,54 @@ def uploadreply():
 
         pass
     return 'success'
+
+@app.route('/SuperCraftsman/getreply', methods=['GET',' POST'])
+def getreply():
+    reply_to_id = request.args.get('reply_id', 0)
+    print(reply_to_id)
+    state = -1
+    sql = "select * from comment where reply_id = %d;" % (int(reply_to_id))
+    cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+
+    usr_ids = []
+    usr_accounts = []
+    usr_photopths = []
+    cmm_ids = []
+    replies = []
+    date_stamps = []
+
+    try:
+        cursor.execute(sql)
+        data = cursor.fetchall()
+
+        for d in data:
+            # print(d)
+            usr_ids.append(d['usr_id'])
+            replies.append(d['context'])
+            date_stamps.append(str(d['gdatetime']))
+            state = 1
+    except:
+        connection.rollback()
+    if state == 1:
+        for usr_id in usr_ids:
+            sql = "select * from user where id = %d"%(usr_id)
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+            try:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+                usr_photopths.append(data[0]['photopth'])
+            except:
+                connection.rollback()
+    print(replies)
+    print(date_stamps)
+    return simplejson.dumps({
+        'state': state,
+        'no': 'no',
+        'usr_ids': usr_ids,
+        'replies': replies,
+        'date_stamps': date_stamps,
+        'usr_photopths': usr_photopths
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)

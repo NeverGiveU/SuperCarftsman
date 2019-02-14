@@ -120,6 +120,24 @@
                         <div class="classynav">
                             <ul>
                                 <li><a href="{{url_for('index')}}">Home</a> </li>
+                                <li class="megamenu-item">
+                                    <a href="#">教程分类</a>
+                                    <div class="megamenu">
+                                        <ul class="single-mega cn-col-3">
+                                            <li class="title">A A</li>
+                                            <li>aa</li>
+                                        </ul>
+                                        <ul class="single-mega cn-col-3">
+                                            <li class="title">A A A</li>
+                                            <li>aa</li>
+                                        </ul>
+                                        <ul class="single-mega cn-col-3">
+                                            <li class="title">A A A A</li>
+                                            <li>aa</li>
+                                        </ul>
+                                    </div>
+
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -192,6 +210,22 @@
     </div>
 </div>
 
+<!--main area-->
+<div class="jc-hot width980 fixed">
+    <div class="size16 jc-hot-tit fixed">
+        热门<h2 style="font-size: 16px; display: inline;">匠人教程</h2>
+        &nbsp;&nbsp;Tutorial
+        <a href="#" class="size14 fense" target="_blank">More</a>::after
+    </div>
+    <div class="sgk-gerenzhuye-con">
+        <div id="sgk-gerenzhuye-jc" class="fixed">
+            <div class="sgk-gerenzhuye-list fixed" _hover-ignore="1" id="sample_tutorials">
+                <!--tutorials-->
+            </div>
+        </div>
+    </div>
+</div>
+
 <!--Footer area start-->
 <div class="footer-framework">
     <hr/>
@@ -226,8 +260,9 @@
 
     var header = document.getElementById('header');
     var account_level = document.getElementById('account_level');
-
+    var sample_tutorials = document.getElementById('sample_tutorials');
     function load(){
+        init_tutorials();
         var data = {
             'state':state,
         };
@@ -263,6 +298,84 @@
             error:function(error){
             }
         })
+    }
+    
+    function init_tutorials() {
+        var tut_ids = [], host_ids = [], host_names = [], host_photos = [], titles = [];
+        var request = {
+            'state': -2 // get the at most advanced FOR -- -2
+        };
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/gettutorials',
+            data:request,
+            dataType:'json',
+            success: function (data) {
+                if (data.state > 0){
+                    tut_ids = data.tut_ids;
+                    titles = data.titles;
+                    host_ids = data.host_ids;
+                    host_names = data.host_names;
+                    host_photos = data.host_photos;
+                    console.log(host_names);
+                    var count = tut_ids.length;
+                    for(var i = 0; i < count; ++i){
+                        var div = document.createElement('div');
+                        div.setAttribute('class', 'sgk-gerenzhuye-jc-one');
+                        // part 1: img
+                        var p = document.createElement('p');
+                        var a = document.createElement('a');
+                        a.setAttribute('href', '/SuperCraftsman/tutorialdetails?tutorial_no='+tut_ids[i]);
+                        a.target = '_blank';
+                        a.rel = 'nofollow';
+                        var img = document.createElement('img');
+                        img.src = '../static/tutorials/'+tut_ids[i]+'/src/1.png';
+                        img.width = 228;
+                        img.height = 172;
+                        a.appendChild(img);
+                        p.appendChild(a);
+                        div.appendChild(p);
+
+                        // part 2: title
+                        var div2 = document.createElement('div');
+                        div2.setAttribute('class', 'sgk-gerenzhuye-jc-one-info');
+                        var h3 = document.createElement('h3');
+                        h3.setAttribute('class', 'jc-tit');
+                        h3.innerHTML=titles[i];
+                        div2.appendChild(h3);
+                        div.appendChild(div2);
+
+                        // part 3: host
+                        var div3 = document.createElement('div');
+                        div3.setAttribute('class', 'sgk-jc-writer fixed');
+                        var dl = document.createElement('dl');
+                        dl.setAttribute('class', 'fixed');
+                        var dt = document.createElement('dt');
+                        var a = document.createElement('a');
+                        a.href = '#';
+                        a.target = '_blank';
+                        a.rel = 'nofollow';
+                        var img = document.createElement('img');
+                        img.src = host_photos[i];
+                        img.width = 32; img.height = 32;
+                        a.appendChild(img);
+                        dt.appendChild(a);
+                        dl.appendChild(dt);
+                        var dd = document.createElement('dd');
+                        a = document.createElement('a');
+                        a.href = '#';
+                        a.target = '_blank';
+                        a.innerHTML=(host_names[i]);
+                        dd.appendChild(a);
+                        dl.appendChild(dd);
+                        div3.appendChild(dl);
+                        div.appendChild(div3);
+
+                        sample_tutorials.appendChild(div);
+                    }
+                }
+            }
+        });
     }
 
     function update(){

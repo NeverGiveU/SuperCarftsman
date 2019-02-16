@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎来到匠人堂</title>
+
+    <!--CSS-->
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="../static/css/self_defined_style.css">
+    <link rel="shortcut icon" href="../static/src/images/logo.ico" type="image/x-icon"/>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+            font-weight: 500;
+            font-family: "Microsoft YaHei","宋体","Segoe UI", "Lucida Grande", Helvetica, Arial,sans-serif, FreeSans, Arimo;
+        }
+
+        div.search {padding: 30px 0;}
+
+        form {
+            position: relative;
+            width: 300px;
+            margin: 0 auto;
+        }
+
+        input, button {
+            border: none;
+            outline: none;
+        }
+
+        input {
+            width: 100%;
+            height: 42px;
+            padding-left: 13px;
+        }
+
+        button {
+            height: 42px;
+            width: 42px;
+            cursor: pointer;
+            position: absolute;
+        }
+
+        /*搜索框5*/
+        .bar5 {background: #ffffff;}
+        .bar5 input, .bar5 button {
+            background: transparent;
+        }
+        .bar5 input {
+            border: 2px solid #F9F0DA;
+        }
+        .bar5 button {
+            top: 0;
+            right: 0;
+        }
+        .bar5 button:before {
+            content: "\f002";
+            font-family: FontAwesome;
+            font-size: 16px;
+            color: #F9F0DA;
+        }
+        .bar5 input:focus {
+            border-color: #ffaaa3
+        }
+    </style>
+</head>
+<body onload="load();">
+
+    <div style="text-align: center;">
+        <!--search bar-->
+        <div class="search bar5">
+            <form>
+                <input type="text" placeholder="请输入教程关键词..." id="selection">
+                <button type="submit" id="submit"></button>
+            </form>
+        </div>
+        <!--predefined classifications-->
+        <a href="#" id="modeling" class="aa">模型</a>|
+        <a href="#" id="hand_painting" class="aa">手绘</a>|
+        <a href="#" id="ipaid_painting" class="aa">板绘</a>|
+        <a href="#" id="papering" class="aa">纸艺</a>|
+        <a href="#" id="clothing" class="aa">布艺</a>|
+        <a href="#" id="erasering" class="aa">橡皮章</a>|
+        <a href="#" id="education" class="aa">科技教育</a>|
+        <a href="#" id="software" class="aa">软件使用</a>|
+        <a href="#" id="foods" class="aa">美食烘焙</a>|
+        <a href="#" id="skining" class="aa">美妆护肤</a>|
+        <a href="#" id="others" class="aa">其他</a>
+    </div>
+
+    <hr/>
+    <div class="sgk-gerenzhuye-con">
+        <div id="sgk-gerenzhuye-jc" class="fixed" >
+
+            <div class="sgk-gerenzhuye-list fixed" _hover-ignore="1" id="tutorials" style="margin-left: 2%; text-align: center;">
+                <!--tutorials-->
+
+            </div>
+        </div>
+    </div>
+</body>
+<!--javascripts-->
+<script src="../static/js/jquery/jquery-2.2.4.min.js"></script>
+<script src="../static/js/popper.min.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
+<script src="../static/js/plugins.js"></script>
+<script src="../static/js/active.js"></script>
+<script src="../static/js/index2.js"></script>
+<script type="text/javascript">
+    // functions for the 11 predefined classifications
+    $('#modeling').on('click', function () {
+        type = '模型';
+        location.href="tutorials-ocean?"+"type="+encodeURI(type);
+        init_tutorials(type);
+    })
+    $('#hand_painting').on('click', function () {
+        type = '手绘';
+        location.href="tutorials-ocean?"+"type="+encodeURI(type);
+        init_tutorials(type);
+    })
+    $('#ipaid_painting').on('click', function () {
+        type = '板绘';
+        location.href="tutorials-ocean?"+"type="+encodeURI(type);
+        init_tutorials(type);
+    })
+    $('#papering').on('click', function () {
+        type = '纸艺';
+        location.href="tutorials-ocean?"+"type="+encodeURI(type);
+        init_tutorials(type);
+    })
+    $('#clothing').on('click', function () {
+        type = '布艺';
+        location.href="tutorials-ocean?"+"type="+encodeURI(type);
+        init_tutorials(type);
+    })
+    $('#erasering').on('click', function () {
+        type = '橡皮章';
+        location.href="tutorials-ocean?"+"type="+encodeURI(type);
+        init_tutorials(type);
+    })
+    $('#education').on('click', function () {
+        type = '科技教育';
+        location.href="tutorials-ocean?"+"type="+encodeURI(type);
+        init_tutorials(type);
+    })
+    $('#software').on('click', function () {
+        type = '软件使用';
+        location.href="tutorials-ocean?"+"type="+encodeURI(type);
+        init_tutorials(type);
+    })
+    $('#foods').on('click', function () {
+        type = '美食烘焙';
+        location.href="tutorials-ocean?"+"type="+encodeURI(type);
+        init_tutorials(type);
+    })
+    $('#skining').on('click', function () {
+        type = '美妆护肤';
+        location.href="tutorials-ocean?"+"type="+encodeURI(type);
+        init_tutorials(type);
+    })
+    $('#others').on('click', function () {
+        type = '其他类别';
+        location.href="tutorials-ocean?"+"type="+encodeURI(type);
+        init_tutorials(type);
+    })
+
+    $.getUrlParam = function (name) {  
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象  
+     var r = window.location.search.substr(1).match(reg);  //匹配目标参数  
+     if (r != null)
+            return unescape(r[2]);
+        return null; //返回参数值  
+    }
+    // global variables
+    var tutorials = document.getElementById('tutorials');
+    var type = 0;
+    var selection = '';
+    // functions
+    // to modify the parameters in the url
+    function replaceParamVal(paramName,replaceWith) {
+        var oUrl = this.location.href.toString();
+        var re=eval('/('+ paramName+'=)([^&]*)/gi');
+        var nUrl = oUrl.replace(re,paramName+'='+replaceWith);
+        this.location = nUrl;
+        window.location.href=nUrl
+    }
+
+    function init_tutorials(type) {
+        var state = -1;
+        if (type == -1)
+            state = -1;
+        else
+            state = 1;
+        var tut_ids = [], host_ids = [], host_names = [], host_photos = [], titles = [];
+        var request = {
+            'state': state, // get all the tutorials -- -1
+            'type': type
+        };
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/gettutorials',
+            data:request,
+            dataType:'json',
+            success: function (data) {
+                if (data.state > 0){
+                    tut_ids = data.tut_ids;
+                    titles = data.titles;
+                    host_ids = data.host_ids;
+                    host_names = data.host_names;
+                    host_photos = data.host_photos;
+                    console.log(host_names);
+                    var count = tut_ids.length;
+                    for(var i = 0; i < count; ++i){
+                        var div = document.createElement('div');
+                        div.setAttribute('class', 'sgk-gerenzhuye-jc-one');
+                        // part 1: img
+                        var p = document.createElement('p');
+                        var a = document.createElement('a');
+                        a.setAttribute('href', '/SuperCraftsman/tutorialdetails?tutorial_no='+tut_ids[i]);
+                        a.target = '_blank';
+                        a.rel = 'nofollow';
+                        var img = document.createElement('img');
+                        img.src = '../static/tutorials/'+tut_ids[i]+'/src/1.png?ver=1';
+                        img.width = 228;
+                        img.height = 172;
+                        a.appendChild(img);
+                        p.appendChild(a);
+                        div.appendChild(p);
+
+                        // part 2: title
+                        var div2 = document.createElement('div');
+                        div2.setAttribute('class', 'sgk-gerenzhuye-jc-one-info');
+                        div2.setAttribute('class', 'padding-box');
+                        var h4 = document.createElement('h4');
+                        h4.setAttribute('class', 'jc-tit');
+                        h4.innerHTML=titles[i];
+                        div2.appendChild(h4);
+                        div.appendChild(div2);
+
+                        // part 3: host
+                        var div3 = document.createElement('div');
+                        div3.setAttribute('class', 'sgk-jc-writer fixed');
+                        var dl = document.createElement('dl');
+                        dl.setAttribute('class', 'fixed');
+                        var dt = document.createElement('dt');
+                        var a = document.createElement('a');
+                        a.href = '#';
+                        a.target = '_blank';
+                        a.rel = 'nofollow';
+                        var img = document.createElement('img');
+                        img.src = host_photos[i];
+                        img.width = 32; img.height = 32;
+                        a.appendChild(img);
+                        dt.appendChild(a);
+                        dl.appendChild(dt);
+                        var dd = document.createElement('dd');
+                        a = document.createElement('a');
+                        a.href = '#';
+                        a.target = '_blank';
+                        a.innerHTML=(host_names[i]);
+                        dd.appendChild(a);
+                        dl.appendChild(dd);
+                        div3.appendChild(dl);
+                        div.appendChild(div3);
+
+                        tutorials.appendChild(div);
+                    }
+                }
+            }
+        });
+    }
+
+    function load() {
+
+        var loc = location.href;
+        var n1 = loc.length;//地址的总长度
+        var n2 = loc.indexOf("=");//取得=号的位置
+        type = decodeURI(loc.substr(n2+1, n1-n2));//从=号后面的内容
+        console.log(type);
+        init_tutorials(type);
+    }
+
+    $("#submit").click(function () {
+        event.preventDefault();
+        selection = $('#selection').val();
+        console.log("dasda");
+        replaceParamVal('type',selection);
+
+        var data = {
+            'state': 1,
+            'type': type,
+        };
+
+        $.ajax({
+            'type': 'GET',
+            'url': '/../SuperCraftsman/tutorials-ocean',
+            data: data,
+            datatype: 'json',
+            success: function (data) {
+                // charCodeAt
+                console.log(selection);
+            }
+        })
+
+
+
+    })
+</script>
+</html>

@@ -145,6 +145,7 @@ id int primary key auto_increment,
 srcpth char(100),
 title char(200),
 num_like int default 0,
+classification char(100),
 host_id int,
 foreign  key(host_id) references achievement(id)
 )

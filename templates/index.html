@@ -215,7 +215,7 @@
     <div class="size16 jc-hot-tit fixed">
         热门<h2 style="font-size: 16px; display: inline;">匠人教程</h2>
         &nbsp;&nbsp;Tutorial
-        <a href="#" class="size14 fense" target="_blank">More</a>::after
+        <a href="#" id="more" class="size14 fense" target="_blank">More</a>
     </div>
     <div class="sgk-gerenzhuye-con">
         <div id="sgk-gerenzhuye-jc" class="fixed">
@@ -261,6 +261,11 @@
     var header = document.getElementById('header');
     var account_level = document.getElementById('account_level');
     var sample_tutorials = document.getElementById('sample_tutorials');
+
+    document.getElementById("more").onclick = function(){
+        location.href="SuperCraftsman/tutorials-ocean?"+"type="+encodeURI(-1);
+    }
+
     function load(){
         init_tutorials();
         var data = {
@@ -329,7 +334,7 @@
                         a.target = '_blank';
                         a.rel = 'nofollow';
                         var img = document.createElement('img');
-                        img.src = '../static/tutorials/'+tut_ids[i]+'/src/1.png';
+                        img.src = '../static/tutorials/'+tut_ids[i]+'/src/1.png?ver=1';
                         img.width = 228;
                         img.height = 172;
                         a.appendChild(img);
@@ -339,10 +344,11 @@
                         // part 2: title
                         var div2 = document.createElement('div');
                         div2.setAttribute('class', 'sgk-gerenzhuye-jc-one-info');
-                        var h3 = document.createElement('h3');
-                        h3.setAttribute('class', 'jc-tit');
-                        h3.innerHTML=titles[i];
-                        div2.appendChild(h3);
+                        div2.setAttribute('class', 'padding-box');
+                        var h4 = document.createElement('h4');
+                        h4.setAttribute('class', 'jc-tit');
+                        h4.innerHTML=titles[i];
+                        div2.appendChild(h4);
                         div.appendChild(div2);
 
                         // part 3: host

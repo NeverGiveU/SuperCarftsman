@@ -189,6 +189,7 @@ def uploadtutorial():
     # print(request.args.get('a'))
     # print("uploadtutorial called")
     title = request.form['tutorial_title']
+    classification = request.form['classification']
     title_ = ""
 
     for i in range(len(title)-1):
@@ -267,7 +268,7 @@ def uploadtutorial():
                     fobj.close()
 
                 # new record
-                sql2 = "insert into tutorial (srcpth, title, host_id) values ('%s', '%s', %d)" % (str(count2+1), title_, user_id)
+                sql2 = "insert into tutorial (srcpth, title, host_id, classification) values ('%s', '%s', %d, '%s')" % (str(count2+1), title_, user_id, classification)
                 cursor2 = connection.cursor(cursor=pymysql.cursors.DictCursor)
                 try:
                     cursor2.execute(sql2)
@@ -396,35 +397,49 @@ def gettutorials():
     host_names = []
     host_photos = []
     titles = []
+    if int(state) == 1:
+        type = request.args.get('type', '')
+        print(type)
+        pass
+    else:
+        print(state)
+        try:
+            cursor.execute(sql)
+            data = cursor.fetchall()
+            # print(data)
+            if len(data) > 0:
+                if int(state) == -2:
+                    r = min(4, len(data))
+                    # print(r)
+                if int(state) == -1:
+                    r = len(data)
+                    # print(r)
+                state = 2
+                # get at most 4
+                data.reverse()
+                for i in range(r):
+                    d = data[i]
+                    tut_ids.append(d['id'])
+                    host_ids.append(d['host_id'])
+                    titles.append(d['title'])
+                pass
+        except:
+            print('fail1')
+            connection.rollback()
+        cursor.close()
 
-    try:
-        cursor.execute(sql)
-        data = cursor.fetchall()
-        # print(data)
-        if len(data) > 0:
-            if state == -2:
-                r = min(4, len(data))
-                print(r)
-            if state == -1:
-                r = len(data)
-                print(r)
-            state = 1
-            r = min(4, len(data))
-            # get at most 4
-            data.reverse()
-            for i in range(r):
-                d = data[i]
-                tut_ids.append(d['id'])
-                host_ids.append(d['host_id'])
-                titles.append(d['title'])
-            pass
-    except:
-        print('fail1')
-        connection.rollback()
-    cursor.close()
 
+
+    # decode the titles
+    for i in range(len(titles)):
+        title = titles[i]
+        title = title.split("-")
+        for j in range(len(title)):
+            title[j] = chr(int(title[j]))
+        titles[i] = ''.join(title)
+    # print(titles)
     #print(host_ids)
-    if state == 1:
+    if state == 2:
         for host_id in host_ids:
             sql = "select * from user where id = %d"%(host_id)
             cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
@@ -448,12 +463,29 @@ def gettutorials():
         'titles': titles
     })
 
+@app.route('/SuperCraftsman/tutorials-ocean', methods=['GET', 'POST'])
+def tutorialsocean():
+    response = make_response(render_template('tutorials-ocean.html'))
+    return response
+
 """===================================================================================================== users' part """
 @app.route('/SuperCraftsman/validation', methods=['GET', 'POST'])
 def validation():
     # print("Validation Called")            # -1        none
     state = int(request.args.get('state', 0))
     ckie = request.cookies.get('cookie')
+    nickname = None
+    account = None
+    email = None
+    sex = None
+    birth = None
+    province = None
+    city = None
+    county = None
+    procession = None
+    signature = None
+    photopth = None
+    user_id = None
     if state == -1:
         # asking for request
         state += 1                          # 0         get dealt

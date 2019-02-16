@@ -164,7 +164,10 @@
                     // console.log(t_pths);
                     update();
                 }else{
-
+                    console.log("Automatically fails!");
+                    // uncorresponding cookie, need to re-login in
+                    alert("登录超时，请重新登录！");
+                    // document.getElementById("gotohome").click();
                 }
                 console.log(photopth);
             },
@@ -172,7 +175,7 @@
                 console.log("Automatically fails!");
                 // uncorresponding cookie, need to re-login in
                 alert("登录超时，请重新登录！");
-                document.getElementById("gotohome").click();
+                // document.getElementById("gotohome").click();
             }
         })
     }

@@ -216,10 +216,16 @@
                     console.log(data.title);
                     add_component(num);
                     var title = data.title;
+                    var num_like = data.num_like;
+                    var num_order = data.num_order;
                     var content = data.content;
                     target = "#title_"+num;
                     // console.log(target);
                     $(target).html(title);
+                    target = '#num_like'+num;
+                    $(target).html(num_like);
+                    target = '#num_order'+num;
+                    $(target).html(num_order);
                 }
             }
         });
@@ -278,15 +284,30 @@
         //footer
         var div2 = document.createElement('div');
         div2.setAttribute('class', 'info-box d-flex align-content-center');
+        // 喜欢
         var p = document.createElement('p');
         span = document.createElement('span');
         span.setAttribute('class', 'read-num');
         span.innerHTML = "喜欢 ";
         var span2 = document.createElement('span');
         span2.setAttribute('class', 'num');
+        span2.setAttribute('id', 'num_like'+num)
         span2.innerHTML = 0;
         span.appendChild(span2);
         p.appendChild(span);
+        div2.appendChild(p);
+        // 畅销度
+        var p = document.createElement('p');
+        span = document.createElement('span');
+        span.setAttribute('class', 'read-num');
+        span.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;畅销度 ";
+        var span2 = document.createElement('span');
+        span2.setAttribute('class', 'num');
+        span2.setAttribute('id', 'num_order'+num)
+        span2.innerHTML = 0;
+        span.appendChild(span2);
+        p.appendChild(span);
+
         div2.appendChild(p);
         div.appendChild(div2);
         tutorial_db.appendChild(div);

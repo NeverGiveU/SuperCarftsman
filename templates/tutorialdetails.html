@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="shortcut icon" href="../static/src/images/logo_t.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" href="../static/src/images/logo.ico" type="image/x-icon"/>
     <!--CSS-->
     <link rel="stylesheet" href="../static/css/content_toolbar.css">
     <link rel="stylesheet" href="../static/css/self_defined_style.css">
@@ -66,6 +66,18 @@
         </tr>
     </table>
     <!--<img src="../static/src/images/reward.png" class="journal-reward"/>-->
+    <!--editor-->
+    <input type="image"
+           onmouseover="this.src='../static/src/images/editor3.png'"
+           onmouseout="this.src='../static/src/images/editor.png'"
+           onmousedown="this.src='../static/src/images/editor2.png'"
+           id="gotoedit" src="../static/src/images/editor.png" width="50" height="50" style="position:fixed;right:5%;top:85%; display: none;">
+    <input type="image"
+           onmouseover="this.src='../static/src/images/buyer.png'"
+           onmouseout="this.src='../static/src/images/buyer2.png'"
+           onmousedown="this.src='../static/src/images/buyer3.png'"
+           id="gotobuy" src="../static/src/images/buyer2.png" width="50" height="50" style="position:fixed;right:5%;top:85%; display: none;">
+
 </body>
 <script src="../static/js/jquery/jquery-2.2.4.min.js"></script>
 <script type="text/javascript">
@@ -81,6 +93,13 @@
         var filename = '../static/tutorials/' + String(num) + '/strut.txt';
         write_tutorial(filename, num);
     }
+
+    $('#gotoedit').on('click', function () {
+        location.href="tutorial_modifier?"+"tutorial_no="+(id);
+    })
+    $('#gotobuy').on('click', function () {
+        location.href="buying?"+"tutorial_no="+(id);
+    })
 
     function write_tutorial(filename, num){
         var target = "";
@@ -155,7 +174,8 @@
     }
     var cur_id = 0;
     function load(){
-        // validate
+
+        // validate 1
         var data = {
             'state':state,
         };
@@ -184,6 +204,28 @@
         var n2 = loc.indexOf("=");//取得=号的位置
         id = decodeURI(loc.substr(n2+1, n1-n2));//从=号后面的内容
         document.getElementById('save_id').value = id;
+
+        // validate 2
+        var data = {
+            'request': -1,
+            'tut_id': id
+        };
+        // var gotoedit = document.getElementById('gotoedit');
+        var gotobuy = document.getElementById('gotobuy');
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/user_tutorial_consistency',
+            data:data,
+            dataType:'json',
+            success: function(data){
+                if (data.state == 3){
+                    // gotoedit.style.display="";
+                }
+                if (data.state == 2){
+                    gotobuy.style.display="";
+                }
+            }
+        });
 
         // console.log(id);
         init();

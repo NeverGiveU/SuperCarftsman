@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>成品订购</title>
+    <link rel="shortcut icon" href="../static/src/images/logo.ico" type="image/x-icon"/>
+    <!--CSS-->
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="../static/css/content_toolbar.css">
+    <link rel="stylesheet" href="../static/css/self_defined_style.css">
+    <link rel="stylesheet" href="../static/css/list-b85bd04713.min.css">
+    <link rel="stylesheet" href="../static/css/skin-yellow-2eefd34acf.min.css">
+    <link rel="stylesheet" href="../static/css/sandalstrap.min.css">
+</head>
+<body onload="load();">
+    <div width="50" height="50" style="position:fixed;left:5%;top:85%;">
+        <img src="../static/src/images/BIT.png" width="100px" height="100px"/>
+        <input type="text" placeholder="0" class="operator_mul" readonly="true" value="×"/>
+        <input type="text" placeholder="0" class="order_input_mul" id="mygrades" readonly="true"/>
+    </div>
+    <table style="margin-top: 100px; margin-bottom: 100px; margin-left: 10%; margin-right: 10%; alignment: center; border-collapse:separate; border-spacing:10px;" width="80%" >
+        <tr>
+
+            <td valign="top" width="90%" id="tutorial_steps">
+                <div style="width: 100%; background-color: white; padding: 20px; box-shadow: 0 0 20px #afafaf;">
+                    <table width="100%">
+                        <tr>
+                            <td width="40%">
+                                <img src="../static/tutorials/3/src/1.png" width="100%" id="tut_img"/>
+                            </td>
+                            <td width="60%"></td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <h3 id="tutorial_title" class="title_text"/>
+                            </td>
+                            <td align="left" style="padding-left: 10px; background-color: #ffffff; padding: 10px;">
+
+                                    <input type="button" value="-" class="add_minus_btn" id="minus_btn"/>
+                                    <input type="text" placeholder="0" class="order_input" id="num_order"/>
+                                    <input type="button" value="+" class="add_minus_btn" id="add_btn"/>
+                                    <input type="text" placeholder="0" class="operator" readonly="true" value="×"/>
+                                    <input type="text" placeholder="0" class="order_input" readonly="true" value="0.00" id="price" style="color: #cb841b"/>
+                                    <input type="text" placeholder="0" class="operator" readonly="true" value="="/>
+                                    <input type="text" placeholder="0" class="order_input" readonly="true" value="0.00" id="sum" style="color: #ff1c0a"/>
+                                    <input type="image" readonly="true" src="../static/src/images/BIT.png" width="40px" height="40px" class="image_btn"/>
+                                    <br/>
+                                    <br/>
+                                    <div class="col-12 col-md-6">
+                                        <div class="group">
+                                            联系方式
+                                            <input type="text" name="tel" id="tel" required>
+                                            <span class="highlight"></span>
+                                            <span class="bar"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="group">
+                                            收件人
+                                            <input type="text" name="receiver" id="receiver" required>
+                                            <span class="highlight"></span>
+                                            <span class="bar"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="group">
+                                            收件地址
+                                            <input type="text" name="address" id="address" required>
+                                            <span class="highlight"></span>
+                                            <span class="bar"></span>
+                                        </div>
+                                    </div>
+                                <button type="button" class="btn original-btn" id="submit">提交订单</button>
+
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <br/>
+            </td>
+        </tr>
+    </table>
+</body>
+<!--scripts-->
+<script src="../static/js/jquery/jquery-2.2.4.min.js"></script>
+<script src="../static/js/popper.min.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
+<script src="../static/js/plugins.js"></script>
+<script src="../static/js/active.js"></script>
+<script src="../static/js/index2.js"></script>
+
+<script type="text/javascript">
+    /* variable */
+    var id;
+    var num_order = 0;
+    var money = 0.0;
+    var sum = 0.0;
+    function load(){
+        var loc = location.href;
+        var n1 = loc.length;
+        var n2 = loc.indexOf("=");
+        id = decodeURI(loc.substr(n2+1, n1-n2));
+
+        get_tutorial(parseInt(id));
+
+        get_usr();
+
+    }
+    $('#minus_btn').on('click', function () {
+        if ($('#num_order').val() != '')
+            num_order = parseInt($('#num_order').val());
+        if (num_order > 0){
+            num_order -= 1;
+            $('#num_order').val(num_order);
+            sum = num_order*parseFloat($('#price').val());
+            $('#sum').val((sum).toFixed(2));
+        }
+    })
+    $('#add_btn').on('click', function () {
+        if ($('#num_order').val() != '')
+            num_order = parseInt($('#num_order').val());
+        if (num_order < 999){
+            num_order += 1;
+            $('#num_order').val(num_order);
+            sum = num_order*parseFloat($('#price').val());
+            $('#sum').val((sum).toFixed(2));
+        }
+    })
+
+    function get_tutorial(id){
+        var data = {
+            'tut_id': id
+        };
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/gettutorial',
+            data:data,
+            dataType:'json',
+            success: function(data) {
+                if (data.state >= 0){
+                    var imgs = data.imgs;
+                    var title = data.title;
+                    var contents = data.contents;
+                    var price = data.price;
+                    var length = imgs.length;
+                    console.log(price);
+                    document.title = '匠人堂-成品订购：'+title;
+                    tutorial_title.innerHTML = title;
+                    console.log(imgs);
+                    $('#tut_img').attr('src', imgs[0]+'?ver=1');
+                    $('#price').val(price.toFixed(2));
+                }
+            }
+        });
+    }
+
+    function get_usr(){
+        var grades = 0.0;
+
+        var data = {};
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/get_money',
+            data:data,
+            dataType:'json',
+            success: function(data) {
+                grades = data.grade;
+                money = grades;
+                $('#mygrades').val(grades.toFixed(2));
+            }
+        })
+
+
+    }
+
+    $('#submit').on('click', function () {
+        // check
+        var tel = $('#tel').val();
+        var name = $('#receiver').val();
+        var address = $('#address').val();
+        if (num_order == 0)
+            alert('请至少购买一份！');
+        if (tel.length == 0 || name.length == 0 || address.length == 0){
+            alert('请完善快递所需信息！');
+        }else {
+            if(confirm("确定要购买吗？")){
+                if (money >= sum){
+                    /*
+                    1）扣除余额；
+                    2）形成订单；
+                    3）告知销售者；
+                     */
+                }else{
+                    if(confirm("警告：匠魂余额不足，是否前往充值？")){
+                        // 充值
+                    }else{
+                        // nothing
+                    }
+                }
+            }else{
+                // nothing
+            }
+        }
+    })
+</script>
+</html>

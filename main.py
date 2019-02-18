@@ -17,6 +17,7 @@ from saltHashing import get_md5, get_salt
 import datetime
 from PIL import Image
 import time
+import difflib
 
 # connect to the database
 connection = pymysql.connect(
@@ -190,6 +191,11 @@ def uploadtutorial():
     # print("uploadtutorial called")
     title = request.form['tutorial_title']
     classification = request.form['classification']
+    try:
+        price = float(request.form['price'])
+    except:
+        if price == None:
+            price = 0.0
     title_ = ""
 
     for i in range(len(title)-1):
@@ -268,7 +274,7 @@ def uploadtutorial():
                     fobj.close()
 
                 # new record
-                sql2 = "insert into tutorial (srcpth, title, host_id, classification) values ('%s', '%s', %d, '%s')" % (str(count2+1), title_, user_id, classification)
+                sql2 = "insert into tutorial (srcpth, title, host_id, classification, price) values ('%s', '%s', %d, '%s', %f)" % (str(count2+1), title_, user_id, classification, price)
                 cursor2 = connection.cursor(cursor=pymysql.cursors.DictCursor)
                 try:
                     cursor2.execute(sql2)
@@ -349,6 +355,8 @@ def uploadtutorial():
 @app.route('/SuperCraftsman/gettutorialtxt', methods=['GET', 'POST'])
 def gettutorialtxt():
     filename = request.args.get('filename', "")
+    # '../static/tutorials/' + String(num) + '/strut.txt'
+    tut_id = int(filename.split("/")[3])
     filename = filename.split("..")[1].split("/")
     title = ''
     contents = []
@@ -375,10 +383,78 @@ def gettutorialtxt():
             line = fhandle.readline()
         fhandle.close()
         # print(contents)
+    # get num_like and num_order
+    num_like = 0
+    num_order = 0
+    sql = "select * from tutorial where id = %d" % tut_id
+    cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+    try:
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        if len(data) > 0:
+            num_like = data[0]['num_like']
+            num_order = data[0]['num_order']
+        # print(count)
+    except:
+        connection.rollback()
+    cursor.close()
+
+    # print(num_like)
+
     return simplejson.dumps({
         'state': state,
         'title': title,
-        'content': contents
+        'content': contents,
+        'num_like': num_like,
+        'num_order': num_order
+    })
+
+@app.route('/SuperCraftsman/user_tutorial_consistency', methods=['GET', 'POST'])
+def user_tutorial_consistency():
+    state = -1
+    ckie = None
+    tut_id = 0
+
+    try:
+        ckie = request.cookies.get('cookie')
+        tut_id = request.args.get('tut_id', 0)
+        # print("success got tut_id")
+    except:
+        pass
+    host_id = 0
+    if state == -1:
+        # asking for request
+        state += 1                          # 0         get dealt
+        if ckie is not None:
+            # print(ckie)
+            # user information
+            sql = "select * from user where cookie = '%s';" % ckie
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+            state += 1                      # 1         with cookie
+            nickname = None
+            try:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+                if len(data) == 1:
+                    state += 1              # 2         found the user
+                    host_id = data[0]['id']
+            except:
+                connection.rollback()
+            cursor.close()
+    if state == 2:
+        sql = "select * from tutorial where host_id = %d and id=%d;" % (int(host_id), int(tut_id))
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(sql)
+            data = cursor.fetchall()
+            if len(data) == 1:
+                state += 1  # 3         consistent
+        except:
+            connection.rollback()
+        cursor.close()
+    # print('{}{}{}'.format(tut_id, host_id, state))
+    return simplejson.dumps({
+        'state': state,
     })
 
 @app.route('/SuperCraftsman/tutorialdetails', methods=['GET', 'POST'])
@@ -389,8 +465,6 @@ def tutorialdetails():
 @app.route('/SuperCraftsman/gettutorials', methods=['GET', 'POST'])
 def gettutorials():
     state = request.args.get('state', 0)
-    sql = "select * from tutorial"
-    cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
 
     tut_ids = []
     host_ids = []
@@ -398,12 +472,42 @@ def gettutorials():
     host_photos = []
     titles = []
     if int(state) == 1:
+        state = 2
         type = request.args.get('type', '')
-        print(type)
-        pass
-    else:
-        print(state)
+        # print(type)
+        # two parts -- 1) use classifications
+        # two parts -- 2) use titles
+        sql = "select * from tutorial"
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
         try:
+            cursor.execute(sql)
+            data = cursor.fetchall()
+        except:
+            connection.rollback()
+        cursor.close()
+
+        # print(data)
+        for i in range(len(data)):
+            d = data[i]
+
+
+            title = d['title'].split('-')
+            for j in range(len(title)):
+                title[j] = chr(int(title[j]))
+            title = ''.join(title)
+            print('{}-{}'.format(d['classification'], title))
+
+            rel = difflib.SequenceMatcher(None, type, title).quick_ratio()
+            print(rel)
+            if d['classification'] == type or rel >= 0.2:
+                tut_ids.append(d['id'])
+                host_ids.append(d['host_id'])
+                titles.append(d['title'])
+    else:
+        # print(state)
+        try:
+            sql = "select * from tutorial"
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
             cursor.execute(sql)
             data = cursor.fetchall()
             # print(data)
@@ -428,8 +532,6 @@ def gettutorials():
             connection.rollback()
         cursor.close()
 
-
-
     # decode the titles
     for i in range(len(titles)):
         title = titles[i]
@@ -453,7 +555,8 @@ def gettutorials():
                 print('fail2')
                 connection.rollback()
             cursor.close()
-    #print(host_photos)
+    # print(host_photos)
+    # print(host_names)
     return simplejson.dumps({
         'state': state,
         'tut_ids': tut_ids,
@@ -463,9 +566,74 @@ def gettutorials():
         'titles': titles
     })
 
+@app.route('/SuperCraftsman/gettutorial', methods=['GET', 'POST'])
+def gettutorial():
+    state = -1
+    price = 0.0
+    tut_id = request.args.get('tut_id', 0)
+    # get price
+    sql = "select * from tutorial where id = %d" % (int(tut_id))
+    cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+    try:
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        if len(data) == 1:
+            price = data[0]['price']
+    except:
+        connection.rollback()
+    cursor.close()
+
+    # print(tut_id)
+    pth = os.path.join('static', 'tutorials', tut_id)
+    imgs = []
+    title = ''
+    contents = []
+    if os.path.exists(pth):
+        imgs = os.listdir(os.path.join(pth, 'src'))
+        for i in range(len(imgs)):
+            imgs[i] = '../static/tutorials/'+tut_id+'/src/'+imgs[i]
+
+        fhandle = open(os.path.join(pth, 'strut.txt'), 'r', encoding='UTF-8')
+        line = fhandle.readline()
+        title = line
+        line = fhandle.readline()
+        contents = []
+        content = []
+        while line:
+            if line == '<>\n':
+                if content != []:
+                    contents.append(content)
+                    content = []
+                pass
+            else:
+                if line != '\n':
+                    content.append(line)
+
+            line = fhandle.readline()
+        fhandle.close()
+
+        state += 1
+        pass
+    else:
+        pass
+    print(price)
+    return simplejson.dumps({
+        'state': state,
+        'imgs': imgs,
+        'title': title,
+        'contents': contents,
+        'price': price
+    })
+
 @app.route('/SuperCraftsman/tutorials-ocean', methods=['GET', 'POST'])
 def tutorialsocean():
     response = make_response(render_template('tutorials-ocean.html'))
+    return response
+
+@app.route('/SuperCraftsman/tutorial_modifier', methods=['GEt', 'POST'])
+def tutorial_modifier():
+
+    response = make_response(render_template('tutorial_modifier.html'))
     return response
 
 """===================================================================================================== users' part """
@@ -710,6 +878,35 @@ def uploadinfo():
 @app.route('/SuperCraftsman/selfhome')
 def selfhome():
     response = make_response(render_template('selfhome.html'))
+    return response
+
+
+@app.route('/SuperCraftsman/get_money', methods=['GET'])
+def get_money():
+    ckie = request.cookies.get('cookie')
+    grade = 0.0
+    if ckie is not None:
+        sql = "select * from user where cookie = '%s';" % (ckie)
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(sql)
+            data = cursor.fetchall()
+            if len(data) > 0:
+                grade = data[0]['grades']
+        except:
+            pass
+        cursor.close()
+    return simplejson.dumps({
+        'grade': grade
+    })
+
+
+
+
+"""==================================================================================================== orders' part """
+@app.route('/SuperCraftsman/buying', methods=['GET', 'POST'])
+def buying():
+    response = make_response(render_template('buying.html'))
     return response
 
 """=================================================================================================== comment' part """

@@ -21,7 +21,14 @@ connection = pymysql.connect(
     database="craftsman"
 )
 
+
 '''drop all the tables'''
+sql_del = '''drop table if exists tradeorder'''
+cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+cursor.execute(sql_del)
+cursor.close()
+print('Successfully delete table \'order\'!')
+
 sql_del = '''drop table if exists collection'''
 cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
 cursor.execute(sql_del)
@@ -147,6 +154,8 @@ title char(200),
 num_like int default 0,
 classification char(100),
 host_id int,
+price double default 0.0,
+num_order int default 0,
 foreign  key(host_id) references achievement(id)
 )
 '''
@@ -196,3 +205,20 @@ if not os.path.exists(path):
 print('Successfully create the manager \'user\'!')
 
 connection.close()
+
+sql_ord = '''create table tradeorder(
+id int primary key auto_increment,
+gdatetime timestamp not null default current_timestamp,
+seller_id int,
+buyer_id int,
+tutorial_id int,
+num int,
+price float,
+address char(200),
+tel char(50),
+status int default -1
+)'''
+cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+cursor.execute(sql_ord)
+cursor.close()
+print('Successfully create table \'order\'!')

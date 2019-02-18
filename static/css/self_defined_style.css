@@ -304,3 +304,92 @@ h3{
 .aa:hover{
     color: #ffa26d;
 }
+
+.outBox{
+
+    height: 700px;
+    overflow-y: auto;
+}
+
+.add_minus_btn{
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #3335ff;
+    background-color: #a8b6ff;
+    color: white;
+    font-size: 25px;
+    vertical-align:middle;
+    text-align: center;
+}
+.add_minus_btn:active{
+    order-radius: 10px;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #3335ff;
+    background-color: #8392ff;
+    color: white;
+    font-size: 25px;
+    vertical-align:middle;
+    text-align: center;
+}
+.order_input{
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ededed;
+    width: 150px;
+    background-color: #ffffff;
+    color: #573314;
+    font-size: 25px;
+    vertical-align:middle;
+    text-align: center;
+}
+.operator{
+    height: 40px;
+    border: none;
+    width: 40px;
+    background-color: #ffffff;
+    color: #9b9696;
+    font-size: 25px;
+    vertical-align:middle;
+    text-align: center;
+}
+
+.image_btn{
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #ffffff;
+    background-color: #ffffff;
+    color: white;
+    font-size: 25px;
+    vertical-align:middle;
+    text-align: center;
+}
+.operator_mul{
+    height: 40px;
+    border: none;
+    width: 40px;
+    background: linear-gradient(to right,#00e1ff, #09ff19);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
+    font-size: 50px;
+    background-color: rgba(255, 255, 255, 0.0);
+    vertical-align:middle;
+    text-align: center;
+}
+.order_input_mul{
+    width: 200px;
+    border: none;
+    background: linear-gradient(to right,#00e1ff, #09ff19);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
+    font-size: 50px;
+    background-color: rgba(255, 255, 255, 0.0);
+    font-size: 60px;
+    vertical-align:middle;
+    text-align: center;
+}

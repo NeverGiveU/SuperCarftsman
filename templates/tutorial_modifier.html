@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" href="../static/src/images/logo.ico" type="image/x-icon"/>
+    <!--CSS-->
+    <link rel="stylesheet" href="../static/css/content_toolbar.css">
+    <link rel="stylesheet" href="../static/css/self_defined_style.css">
+    <link rel="stylesheet" href="../static/css/list-b85bd04713.min.css">
+    <link rel="stylesheet" href="../static/css/skin-yellow-2eefd34acf.min.css">
+    <link rel="stylesheet" href="../static/css/sandalstrap.min.css">
+</head>
+<body onload="load();">
+    <table style="margin-top: 100px; margin-bottom: 100px; margin-left: 10%; margin-right: 10%; alignment: center; border-collapse:separate; border-spacing:10px;" width="80%" >
+        <tr>
+            <td/>
+            <td valign="top" width="90%" id="tutorial_steps">
+                <div class="filter-box d-flex align-items-center">
+                    <h3 id="tutorial_title" class="title_text"/>
+                </div>
+                <br/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="outBox" id="outBox">
+
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+
+<script src="../static/js/jquery/jquery-2.2.4.min.js"></script>
+<script src="../static/js/popper.min.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
+<script src="../static/js/plugins.js"></script>
+<script src="../static/js/active.js"></script>
+<script src="../static/js/sharing.js"></script>
+<script src="../static/js/birthday.js"></script>
+<script src="../static/js/PCASClass.js"></script>
+<script type="text/javascript">
+    /* variable */
+    var id;
+    var tutorial_title = document.getElementById('tutorial_title');
+    var outBox = document.getElementById('outBox');
+    function load(){
+        var loc = location.href;
+        var n1 = loc.length;
+        var n2 = loc.indexOf("=");
+        id = decodeURI(loc.substr(n2+1, n1-n2));
+
+        get_tutorial(parseInt(id));
+
+    }
+
+    function get_tutorial(id){
+        var data = {
+            'tut_id': id
+        };
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/gettutorial',
+            data:data,
+            dataType:'json',
+            success: function(data) {
+                if (data.state >= 0){
+                    var imgs = data.imgs;
+                    var title = data.title;
+                    var contents = data.contents;
+                    var length = imgs.length;
+                    console.log(title);
+                    document.title = '匠人堂教程：'+title;
+                    tutorial_title.innerHTML = title;
+
+                }
+            }
+        });
+    }
+</script>
+</html>

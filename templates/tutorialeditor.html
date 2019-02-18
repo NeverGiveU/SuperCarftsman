@@ -26,6 +26,9 @@
                     <a>新建步骤 <b>+</b></a>
                 </div>
                 <br/>
+                <div id="new_price_btn" class="filter-box d-flex align-items-center" onmouseover="this.className='hover_div d-flex align-items-center'" onmouseout="this.className='filter-box d-flex align-items-center'">
+                    <input type="text" name="price" id="price" placeholder="定价: xx ￥" style="border-top-style: none; border-left-style: none; border-right-style: none; width: 80px;">
+                </div>
                 <div id="new_classify_btn" style="" class="filter-box d-flex align-items-center" onmouseover="this.className='hover_div d-flex align-items-center'" onmouseout="this.className='filter-box d-flex align-items-center'">
                     <select style="border: none; font-size: 15px; color: #705f37;" name="classification">
 
@@ -52,7 +55,9 @@
                     <input type="text" name="tutorial_title" id="tutorial_title" placeholder=">> 编辑标题..." class="title_text" style="display: none"/>
                 </div>
                 <br/>
+                <div class="outBox" id="outBox">
 
+                </div>
             </td>
         </tr>
     </table>
@@ -81,7 +86,7 @@
     var new_step_flag = false;
     var save_flag = false;
     var tutorial_title = document.getElementById('tutorial_title');
-    var tutorial_steps = document.getElementById('tutorial_steps');
+    var tutorial_steps = document.getElementById('outBox');
     var step_count = 0;
     var arr_flags = new Array();
     var img_name = "";

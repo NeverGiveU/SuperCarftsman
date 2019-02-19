@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="../static/css/demo_heart.css">
 </head>
 <body onload="load();">
+    <img src="../static/src/images/like_empty.png" style="position: fixed; margin-left: 90%; margin-bottom: 10%; width: 60px; height: 50px;" id="like"/>
 <table style="margin-top: 100px; margin-bottom: 100px; margin-left: 10%; margin-right: 10%; alignment: center; border-collapse:separate; border-spacing:10px;" width="80%" >
         <tr>
             <td valign="top" width="90%" id="tutorial_steps">
@@ -93,7 +94,21 @@
         var filename = '../static/tutorials/' + String(num) + '/strut.txt';
         write_tutorial(filename, num);
     }
-
+    $('#like').on('click', function () {
+        var data = {'tut_id': id};
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/uploadlike',
+            data:data,
+            dataType:'json',
+            success: function (data) {
+                if (data.state == -1){
+                    alert("请登录后重试！");
+                }else
+                    $('#like').attr('src', '../static/src/images/like_full.png');
+            }
+        });
+    })
     $('#gotoedit').on('click', function () {
         location.href="tutorial_modifier?"+"tutorial_no="+(id);
     })
@@ -228,9 +243,23 @@
         });
 
         // console.log(id);
+        setlike(id);
         init();
         addtxt(parseInt(id));
         addcomment(id);
+    }
+    function setlike(id) {
+        var data = {'tut_id': id};
+        $.ajax({
+            type:'GET',
+            url:'/../SuperCraftsman/checklike',
+            data:data,
+            dataType:'json',
+            success: function (data) {
+                if (data.state == 2)
+                    $('#like').attr('src', '../static/src/images/like_full.png');
+            }
+        });
     }
     function update(){
         // console.log(title);

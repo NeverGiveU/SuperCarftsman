@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我的订单</title>
+    <link rel="shortcut icon" href="../static/src/images/logo_c.ico" type="image/x-icon"/>
+    <!--CSS-->
+    <link rel="stylesheet" href="../static/css/self_defined_style.css">
+</head>
+<body bgcolor="#F5F6F7">
+    <div class="middle-box">
+        <div class="tabbox">
+            <ul>
+                <li id="item1">待发货</li>
+                <li id="item2">待收货</li>
+                <li id="item3">待确认</li>
+            </ul>
+        </div>
+        <br/>
+        <div id="content">
+
+        </div>
+
+    </div>
+</body>
+
+<!--scripts-->
+<script src="../static/js/jquery/jquery-2.2.4.min.js"></script>
+<script src="../static/js/popper.min.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
+<script src="../static/js/plugins.js"></script>
+<script src="../static/js/active.js"></script>
+<script src="../static/js/index2.js"></script>
+
+<script type="text/javascript">
+    var target = '';
+    var content = document.getElementById('content');
+    var data_;
+    var tels = [], receivers = [], nums = [], prices = [], imgs = [], titles = [], addresses = [], order_ids = [];
+    var length = 0;
+    var state = 0;
+    $(function ()
+    {
+    　　$(".tabbox li").click(function ()
+    　　{
+    　　　　$(this).addClass("active").siblings().removeClass("active");
+    　　　　var index = $(this).index();
+    　　　　$(this).parent().siblings().children().eq(index).addClass("active")
+    　　　　.siblings().removeClass("active");
+            target = $(this).attr('id');
+            if (target == "item1"){
+                data = {
+                    'signal': 1
+                };
+                $.ajax({
+                    type: 'GET',
+                    url: '/../SuperCraftsman/getorders',
+                    data: data,
+                    dataType: 'json',
+                    success: function (data) {
+                        state = data.state;
+                        $('#content').empty();
+                        if(data.state == 3) {
+                            tels = data.tels;
+                            receivers = data.receivers;
+                            nums = data.nums;
+                            prices = data.prices;
+                            imgs = data.imgs;
+                            titles = data.titles;
+                            length = tels.length;
+                            addresses = data.addresses;
+                            order_ids = data.order_ids;
+
+                            for(var i = 0; i < length; ++i){
+                  var div = document.createElement('div'); div.setAttribute('class', 'editing_board');
+                  var table = document.createElement('table');
+                    var row = table.insertRow();
+                        var cell = row.insertCell(0); cell.width = '40%';
+                            var img = document.createElement('img'); img.src = imgs[i]; img.setAttribute('class', 'img_step');
+                        cell.appendChild(img);
+                        cell = row.insertCell(1); cell.width = '60%';
+                    row = table.insertRow();
+                        cell = row.insertCell(0);
+                            var h3 = document.createElement('h3'); h3.innerHTML = titles[i];
+                        cell.appendChild(h3);
+                        cell = row.insertCell(1);
+                            var text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = nums[i]; text.readOnly = true;
+                            cell.appendChild(text);
+                            var btn = document.createElement('input'); btn.setAttribute('class', 'add_minus_btn'); btn.value = '×';
+                            cell.appendChild(btn);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = prices[i].toFixed(2); text.readOnly = true;
+                            cell.appendChild(text);
+                            btn = document.createElement('input'); btn.setAttribute('class', 'add_minus_btn'); btn.value = '=';
+                            cell.appendChild(btn);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = (nums[i]*prices[i]).toFixed(2); text.readOnly = true;
+                            cell.appendChild(text);
+
+
+                            cell.appendChild(document.createElement('hr'));
+
+                            text = document.createElement('input'); text.setAttribute('class', 'operator2'); text.type = 'text'; text.value = '收件人'; text.readOnly = true;
+                            cell.appendChild(text);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = receivers[i]; text.readOnly = true;
+                            cell.appendChild(text);
+                            text = document.createElement('input'); text.setAttribute('class', 'operator2'); text.type = 'text'; text.value = 'Tel'; text.readOnly = true;
+                            cell.appendChild(text);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = tels[i]; text.readOnly = true;
+                            cell.appendChild(text);
+
+                            var br = document.createElement('br');
+                            cell.appendChild(br);
+                            text = document.createElement('input'); text.setAttribute('class', 'operator2'); text.type = 'text'; text.value = '收件地址'; text.readOnly = true;
+                            cell.appendChild(text);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input2'); text.type = 'text'; text.value = addresses[i]; text.readOnly = true;
+                            cell.appendChild(text);
+
+                            var btn = document.createElement('input');
+                            btn.type = 'button';
+                            btn.value = '确认发货';
+                            btn.setAttribute('id', 'btn_'+order_ids[i]);
+                            btn.setAttribute('class', 'ack_btn');
+                            cell.appendChild(btn);
+                            btn.onclick = function(){
+                                console.log($(this).attr('id'));
+                                data = {
+                                    'conp_name': $(this).attr('id'),
+                                    'signal': 1
+                                };
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '/../SuperCraftsman/updateorder',
+                                    data: data,
+                                    dataType: 'json',
+                                    success: function (data) {
+                                        if(data.state == 1){
+                                            alert("发货信息通知成功！");
+                                            location.reload()
+                                        }
+                                    }
+                                });
+                            };
+                  div.appendChild(table);
+                  content.appendChild(div);
+                  br = document.createElement('br');
+                  content.appendChild(br);
+              }
+                        }
+                    }
+                });
+            }else if(target == 'item2'){
+                data = {
+                    'signal': 2
+                };
+                $.ajax({
+                    type: 'GET',
+                    url: '/../SuperCraftsman/getorders',
+                    data: data,
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#content').empty();
+                        state = data.state;
+                        if(data.state == 3) {
+                            tels = data.tels;
+                            receivers = data.receivers;
+                            nums = data.nums;
+                            prices = data.prices;
+                            imgs = data.imgs;
+                            titles = data.titles;
+                            length = tels.length;
+                            addresses = data.addresses;
+                            order_id = data.order_ids;
+
+                            for(var i = 0; i < length; ++i){
+                  var div = document.createElement('div'); div.setAttribute('class', 'editing_board');
+                  var table = document.createElement('table');
+                    var row = table.insertRow();
+                        var cell = row.insertCell(0); cell.width = '40%';
+                            var img = document.createElement('img'); img.src = imgs[i]; img.setAttribute('class', 'img_step');
+                        cell.appendChild(img);
+                        cell = row.insertCell(1); cell.width = '60%';
+                    row = table.insertRow();
+                        cell = row.insertCell(0);
+                            var h3 = document.createElement('h3'); h3.innerHTML = titles[i];
+                        cell.appendChild(h3);
+                        cell = row.insertCell(1);
+                            var text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = nums[i]; text.readOnly = true;
+                            cell.appendChild(text);
+                            var btn = document.createElement('input'); btn.setAttribute('class', 'add_minus_btn'); btn.value = '×';
+                            cell.appendChild(btn);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = prices[i].toFixed(2); text.readOnly = true;
+                            cell.appendChild(text);
+                            btn = document.createElement('input'); btn.setAttribute('class', 'add_minus_btn'); btn.value = '=';
+                            cell.appendChild(btn);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = (nums[i]*prices[i]).toFixed(2); text.readOnly = true;
+                            cell.appendChild(text);
+
+
+                            cell.appendChild(document.createElement('hr'));
+
+                            text = document.createElement('input'); text.setAttribute('class', 'operator2'); text.type = 'text'; text.value = '收件人'; text.readOnly = true;
+                            cell.appendChild(text);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = receivers[i]; text.readOnly = true;
+                            cell.appendChild(text);
+                            text = document.createElement('input'); text.setAttribute('class', 'operator2'); text.type = 'text'; text.value = 'Tel'; text.readOnly = true;
+                            cell.appendChild(text);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = tels[i]; text.readOnly = true;
+                            cell.appendChild(text);
+
+                            var br = document.createElement('br');
+                            cell.appendChild(br);
+                            text = document.createElement('input'); text.setAttribute('class', 'operator2'); text.type = 'text'; text.value = '收件地址'; text.readOnly = true;
+                            cell.appendChild(text);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input2'); text.type = 'text'; text.value = addresses[i]; text.readOnly = true;
+                            cell.appendChild(text);
+                  div.appendChild(table);
+                  content.appendChild(div);
+                  br = document.createElement('br');
+                  content.appendChild(br);
+              }
+                        }
+                    }
+                });
+
+            }else if(target == 'item3'){
+                data = {
+                    'signal': 3
+                };
+                $.ajax({
+                    type: 'GET',
+                    url: '/../SuperCraftsman/getorders',
+                    data: data,
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#content').empty();
+                        state = data.state;
+                        if(data.state == 3) {
+                            tels = data.tels;
+                            receivers = data.receivers;
+                            nums = data.nums;
+                            prices = data.prices;
+                            imgs = data.imgs;
+                            titles = data.titles;
+                            length = tels.length;
+                            addresses = data.addresses;
+                            order_ids = data.order_ids;
+
+                            for(var i = 0; i < length; ++i){
+                  var div = document.createElement('div'); div.setAttribute('class', 'editing_board');
+                  var table = document.createElement('table');
+                    var row = table.insertRow();
+                        var cell = row.insertCell(0); cell.width = '40%';
+                            var img = document.createElement('img'); img.src = imgs[i]; img.setAttribute('class', 'img_step');
+                        cell.appendChild(img);
+                        cell = row.insertCell(1); cell.width = '60%';
+                    row = table.insertRow();
+                        cell = row.insertCell(0);
+                            var h3 = document.createElement('h3'); h3.innerHTML = titles[i];
+                        cell.appendChild(h3);
+                        cell = row.insertCell(1);
+                            var text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = nums[i]; text.readOnly = true;
+                            cell.appendChild(text);
+                            var btn = document.createElement('input'); btn.setAttribute('class', 'add_minus_btn'); btn.value = '×';
+                            cell.appendChild(btn);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = prices[i].toFixed(2); text.readOnly = true;
+                            cell.appendChild(text);
+                            btn = document.createElement('input'); btn.setAttribute('class', 'add_minus_btn'); btn.value = '=';
+                            cell.appendChild(btn);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = (nums[i]*prices[i]).toFixed(2); text.readOnly = true;
+                            cell.appendChild(text);
+
+
+                            cell.appendChild(document.createElement('hr'));
+
+                            text = document.createElement('input'); text.setAttribute('class', 'operator2'); text.type = 'text'; text.value = '收件人'; text.readOnly = true;
+                            cell.appendChild(text);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = receivers[i]; text.readOnly = true;
+                            cell.appendChild(text);
+                            text = document.createElement('input'); text.setAttribute('class', 'operator2'); text.type = 'text'; text.value = 'Tel'; text.readOnly = true;
+                            cell.appendChild(text);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input'); text.type = 'text'; text.value = tels[i]; text.readOnly = true;
+                            cell.appendChild(text);
+
+                            var br = document.createElement('br');
+                            cell.appendChild(br);
+                            text = document.createElement('input'); text.setAttribute('class', 'operator2'); text.type = 'text'; text.value = '收件地址'; text.readOnly = true;
+                            cell.appendChild(text);
+                            text = document.createElement('input'); text.setAttribute('class', 'order_input2'); text.type = 'text'; text.value = addresses[i]; text.readOnly = true;
+                            cell.appendChild(text);
+
+                            var btn = document.createElement('input');
+                            btn.type = 'button';
+                            btn.value = '确认收货';
+                            btn.setAttribute('id', 'btn_'+order_ids[i]);
+                            btn.setAttribute('class', 'ack_btn');
+                            btn.onclick = function(){
+                                console.log("something");
+                            };
+                            btn.onclick = function(){
+                                console.log($(this).attr('id'));
+                                data = {
+                                    'conp_name': $(this).attr('id'),
+                                    'signal': 3
+                                };
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '/../SuperCraftsman/updateorder',
+                                    data: data,
+                                    dataType: 'json',
+                                    success: function (data) {
+                                        if(data.state == 4) {
+                                            alert("收货成功！");
+                                            location.reload();
+                                        }
+                                    }
+                                });
+                            };
+                            cell.appendChild(btn);
+                  div.appendChild(table);
+                  content.appendChild(div);
+                  br = document.createElement('br');
+                  content.appendChild(br);
+              }
+                        }
+                    }
+                });
+
+            }else{}
+      });
+    });
+</script>
+</html>

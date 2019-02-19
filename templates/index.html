@@ -100,6 +100,8 @@
                                     <ul class="dropdown">
                                         <li><a href="{{url_for('selfinfo')}}" target="_blank" style="background-color: white; padding-left: 20px;">个人中心</a></li>
                                         <li><a href="{{url_for('selfhome')}}" target="_blank" style="background-color: white; padding-left: 20px;">个人主页</a></li>
+                                        <li><a href="{{url_for('orders')}}" target="_blank" style="background-color: white; padding-left: 20px;">我的订单</a></li>
+                                        <li><a href="{{url_for('recharge')}}" target="_blank" style="background-color: white; padding-left: 20px;">充值中心</a></li>
                                     </ul>
                                 </li>
                             </ul>
@@ -120,6 +122,7 @@
                         <div class="classynav">
                             <ul>
                                 <li><a href="{{url_for('index')}}">Home</a> </li>
+                                <!--
                                 <li class="megamenu-item">
                                     <a href="#">教程分类</a>
                                     <div class="megamenu">
@@ -138,6 +141,7 @@
                                     </div>
 
                                 </li>
+                                -->
                             </ul>
                         </div>
                     </div>
@@ -257,7 +261,7 @@
     var signature = '';
     var county = '';
     var photopth = '';
-
+    var count = 0;
     var header = document.getElementById('header');
     var account_level = document.getElementById('account_level');
     var sample_tutorials = document.getElementById('sample_tutorials');
@@ -293,7 +297,7 @@
                     procession = data.procession;
                     signature = data.signature;
                     photopth = data.photopth;
-
+                    count = data.count;
                     update();
                 }else{
 
@@ -391,8 +395,6 @@
         document.getElementById("sheader").style.display="";
         document.getElementById('sheader').src = photopth;
     }
-
-
 
     window.onload = function(){
         load();

@@ -20,7 +20,6 @@
     </div>
     <table style="margin-top: 100px; margin-bottom: 100px; margin-left: 10%; margin-right: 10%; alignment: center; border-collapse:separate; border-spacing:10px;" width="80%" >
         <tr>
-
             <td valign="top" width="90%" id="tutorial_steps">
                 <div style="width: 100%; background-color: white; padding: 20px; box-shadow: 0 0 20px #afafaf;">
                     <table width="100%">
@@ -95,6 +94,7 @@
     var num_order = 0;
     var money = 0.0;
     var sum = 0.0;
+    var price = 0.0;
     function load(){
         var loc = location.href;
         var n1 = loc.length;
@@ -141,7 +141,7 @@
                     var imgs = data.imgs;
                     var title = data.title;
                     var contents = data.contents;
-                    var price = data.price;
+                    price = data.price;
                     var length = imgs.length;
                     console.log(price);
                     document.title = '匠人堂-成品订购：'+title;
@@ -178,6 +178,7 @@
         var tel = $('#tel').val();
         var name = $('#receiver').val();
         var address = $('#address').val();
+        // console.log(name);
         if (num_order == 0)
             alert('请至少购买一份！');
         if (tel.length == 0 || name.length == 0 || address.length == 0){
@@ -189,10 +190,37 @@
                     1）扣除余额；
                     2）形成订单；
                     3）告知销售者；
+                    4）购买成功提示。
                      */
+                    // 1)
+                    var data = {
+                        'tut_id': id,
+                        'num': num_order,
+                        'price': price,
+                        'tel': $('#receiver').val()+'@'+$('#tel').val(),
+                        'address': $('#address').val(),
+                        'status': 0,
+                        'name': name
+                    };
+                    $.ajax({
+                        type:'GET',
+                        url:'/../SuperCraftsman/uploadorder',
+                        data:data,
+                        dataType:'json',
+                        success: function(data) {
+                            // console.log(data.state);
+                            if (data.state == 4){
+                                alert('购买成功');
+                            }
+                        },
+                        error: function (error) {
+                            // console.log('failure');
+                        }
+                    });
                 }else{
                     if(confirm("警告：匠魂余额不足，是否前往充值？")){
                         // 充值
+                        window.location ="/../SuperCraftsman/recharge";
                     }else{
                         // nothing
                     }

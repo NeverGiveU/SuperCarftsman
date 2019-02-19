@@ -40,7 +40,7 @@
                         </svg>
                     </use>
                 </svg>
-                管理教程
+                编撰教程
             </a>
         </div>
     </div>
@@ -66,10 +66,12 @@
                                 <dt><a href="#">教程</a> </dt>
                                 <dd><a href="#"><span class="count" id="profile_count_tutorial">?</span> </a> </dd>
                             </dl>
+                            <!--
                             <dl class="text-center">
                                 <dt><a href="#">粉丝</a> </dt>
                                 <dd><a href="#"><span class="count" id="profile_count_fan">?</span> </a> </dd>
                             </dl>
+                            -->
                             <dl class="text-center">
                                 <dt><a href="#">喜欢</a> </dt>
                                 <dd><a href="#"><span class="count" id="profile_count_focus">?</span> </a> </dd>
@@ -131,6 +133,7 @@
     var county = '';
     var photopth = '';
     var t_pths = [];
+    var count = 0; var count_like = 0; var lv = 0;
     var tutorial_db = document.getElementById('tutorial_db');
 
     function load(){
@@ -160,6 +163,9 @@
                     signature = data.signature;
                     photopth = data.photopth;
                     t_pths = data.t_pths;
+                    count = data.count;
+                    count_like = data.count_like;
+                    lv = data.lv;
                     // console.log("Automatically successes!");
                     // console.log(t_pths);
                     update();
@@ -185,6 +191,9 @@
         document.title=nickname + '的主页';
         $("#title_nickname").text(nickname + '的主页');
         $("#profile_nickname").text(nickname);
+        $("#profile_count_tutorial").html(''+count);
+        $("#profile_count_focus").html(''+count_like);
+        $('#profile_lv').html(''+lv);
         document.getElementById("profile_head").src = photopth;
         if (signature != '' && signature != undefined && signature != null){
             $("#title_signature").text(signature);

@@ -28,3 +28,18 @@ sql = "alter table user modify column grades float ;"
 cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
 cursor.execute(sql)
 cursor.close()
+
+sql = "alter table likes change tut_like tut_id int;"
+cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+cursor.execute(sql)
+cursor.close()
+
+sql_cmm = '''create table likes(
+id int primary key auto_increment,
+usr_id int default 0,
+tut_id int default 0
+)'''
+cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+cursor.execute(sql_cmm)
+cursor.close()
+print('Successfully create table \'likes\'!')

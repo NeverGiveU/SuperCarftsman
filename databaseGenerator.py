@@ -218,6 +218,13 @@ address char(200),
 tel char(50),
 status int default -1
 )'''
+'''
+status: 
+-1 --nothing
+ 0 --下单，未发货
+ 1 --商家已发货；等待收货
+ 2 --已确认收货
+'''
 cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
 cursor.execute(sql_ord)
 cursor.close()

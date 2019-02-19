@@ -8,7 +8,7 @@
 @time: 2019/1/30 20:40
 """
 
-from flask import Flask, request, render_template, make_response
+from flask import Flask, request, render_template, make_response, redirect, url_for
 import pymysql
 import simplejson
 import uuid
@@ -29,6 +29,8 @@ connection = pymysql.connect(
     database="craftsman"
 )
 
+levels = [0, 100, 200, 500, 1000, 2000, 5000, 10000, 100000]
+
 '''
 -1 -- failure
 +1 -- success
@@ -36,6 +38,7 @@ connection = pymysql.connect(
 '''
 
 app = Flask(__name__)
+
 
 '''home page'''
 @app.route('/SuperCraftsman')
@@ -179,7 +182,111 @@ def selfinfo():
     response = make_response(render_template('selfinfo.html'))
     return response
 
-"""===================================================================================================== tutorials' part """
+"""===================================================================================================== likes' part """
+@app.route('/SuperCraftsman/uploadlike', methods=['GET', 'POST'])
+def uploadlike():
+    state = -1
+    ckie = request.cookies.get('cookie')
+    tut_id = 0
+
+    if ckie is None:
+        pass
+    else:
+        try:
+            tut_id = int(request.args.get('tut_id', 0))
+            state += 1  # 0
+        except:
+            pass
+        sql = "select * from user where cookie = '%s';" % ckie
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(sql)
+            data = cursor.fetchall()
+            if len(data) == 1:
+                state += 1# 1
+                d = data[0]
+                usr_id = int(d['id'])
+        except:
+            connection.rollback()
+        cursor.close()
+        if state == 1:
+            sql = "select * from likes where usr_id = %d and tut_id=%d;" % (usr_id, tut_id)
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+            try:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+                if len(data) == 0:
+                    state += 1  # 2
+            except:
+                connection.rollback()
+            cursor.close()
+            pass
+        if state == 2:
+            sql = "insert into likes (usr_id, tut_id) values (%d, %d);" % (usr_id, tut_id)
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+            try:
+                cursor.execute(sql)
+                connection.commit()
+                state += 1# 3
+            except:
+                connection.rollback()
+            cursor.close()
+        if state == 3:
+            sql = "update tutorial set num_like = num_like + 1 where id=%d;" % (tut_id)
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+            try:
+                cursor.execute(sql)
+                connection.commit()
+                state += 1  # 4
+            except:
+                connection.rollback()
+            cursor.close()
+    return simplejson.dumps({
+        'state': state,
+    })
+
+@app.route('/SuperCraftsman/checklike', methods=['GET', 'POST'])
+def checklike():
+    state = -1
+
+    ckie = request.cookies.get('cookie')
+    tut_id = 0
+
+    if ckie is None:
+        pass
+    else:
+        try:
+            tut_id = int(request.args.get('tut_id', 0))
+            state += 1# 0
+        except:
+            pass
+        sql = "select * from user where cookie = '%s';" % ckie
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(sql)
+            data = cursor.fetchall()
+            if len(data) == 1:
+                state += 1  # 1
+                d = data[0]
+                usr_id = int(d['id'])
+        except:
+            connection.rollback()
+        cursor.close()
+        if state == 1:
+            sql = "select * from likes where usr_id=%d and tut_id=%d;" % (usr_id, tut_id)
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+            try:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+                if len(data) == 1:
+                    state += 1 # 2
+            except:
+                connection.rollback()
+            cursor.close()
+    return simplejson.dumps({
+        'state': state,
+    })
+"""================================================================================================= tutorials' part """
 @app.route('/SuperCraftsman/tutorialeditor', methods=['GET', 'POST'])
 def tutorialeditor():
     response = make_response(render_template('tutorialeditor.html'))
@@ -294,6 +401,15 @@ def uploadtutorial():
 
     # then we try to load the resources
     if state >= 2:
+        # add the exp
+        sql = "update achievement set exp = exp+10 where user_id=%d"%(user_id)
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(sql)
+            connection.commit()
+        except:
+            connection.rollback()
+        cursor.close()
         # we have gotten the pth
         # print(os.listdir(pth))
         images = os.listdir(os.path.join(pth, 'src'))
@@ -320,6 +436,8 @@ def uploadtutorial():
     })
     '''
     if state >= 2:
+        return redirect(url_for('selfhome'))
+    '''
         return """
     <!DOCTYPE html>
     <html lang="en">
@@ -351,6 +469,7 @@ def uploadtutorial():
             </script>
             </body>
                 """
+    '''
 
 @app.route('/SuperCraftsman/gettutorialtxt', methods=['GET', 'POST'])
 def gettutorialtxt():
@@ -637,6 +756,12 @@ def tutorial_modifier():
     return response
 
 """===================================================================================================== users' part """
+def get_lv(lv):
+    for i in range(len(levels)-1):
+        if lv < levels[i]:
+            break
+    return i
+
 @app.route('/SuperCraftsman/validation', methods=['GET', 'POST'])
 def validation():
     # print("Validation Called")            # -1        none
@@ -654,6 +779,9 @@ def validation():
     signature = None
     photopth = None
     user_id = None
+    count = 0
+    count_like = 0
+    lv = 0
     if state == -1:
         # asking for request
         state += 1                          # 0         get dealt
@@ -709,6 +837,7 @@ def validation():
                 sel_day = int(birth.split('-')[-1])
             # get tutorial paths
             t_pths = []
+
             if state == 2:
                 sql = "select * from tutorial where host_id = %d;" % (user_id)
                 cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
@@ -721,6 +850,41 @@ def validation():
                     pass
                 cursor.close()
                 print(t_pths)
+
+                # get num_tut
+
+                sql = "select count(*) from tutorial where host_id = %d;" % (user_id)
+                cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+                try:
+                    cursor.execute(sql)
+                    data = cursor.fetchall()
+                    count = data[0]['count(*)']
+                    # print(count)
+                except:
+                    pass
+                cursor.close()
+
+                sql = "select sum(num_like) from tutorial where host_id = %d;" % (user_id)
+                cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+                try:
+                    cursor.execute(sql)
+                    data = cursor.fetchall()
+                    count_like = data[0]['sum(num_like)']
+                    # print(count)
+                except:
+                    pass
+                cursor.close()
+
+                sql = "select * from achievement where user_id = %d;" % (user_id)
+                cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+                try:
+                    cursor.execute(sql)
+                    data = cursor.fetchall()
+                    lv = data[0]['exp']
+                    # print(count)
+                except:
+                    pass
+                cursor.close()
 
             return simplejson.dumps({
                 'state': state,
@@ -738,7 +902,10 @@ def validation():
                 'signature': signature,
                 'photopth': photopth,
                 't_pths': t_pths,
-                'user_id': user_id
+                'user_id': user_id,
+                'count': count,
+                'count_like': count_like,
+                'lv': get_lv(lv)
             })
         pass
     return 'SUCCESS'
@@ -880,7 +1047,6 @@ def selfhome():
     response = make_response(render_template('selfhome.html'))
     return response
 
-
 @app.route('/SuperCraftsman/get_money', methods=['GET'])
 def get_money():
     ckie = request.cookies.get('cookie')
@@ -894,14 +1060,11 @@ def get_money():
             if len(data) > 0:
                 grade = data[0]['grades']
         except:
-            pass
+            connection.rollback()
         cursor.close()
     return simplejson.dumps({
         'grade': grade
     })
-
-
-
 
 """==================================================================================================== orders' part """
 @app.route('/SuperCraftsman/buying', methods=['GET', 'POST'])
@@ -909,19 +1072,301 @@ def buying():
     response = make_response(render_template('buying.html'))
     return response
 
+@app.route('/SuperCraftsman/recharge', methods=['GET', 'POST'])
+def recharge():
+    response = make_response(render_template('recharge.html'))
+    return response
+
+@app.route('/SuperCraftsman/incharge', methods=['GET', 'POST'])
+def incharge():
+    state = request.args.get('state')
+    print(state)
+    return simplejson.dumps({
+        'state': -1
+    })
+
+@app.route('/SuperCraftsman/uploadorder', methods=['GET', 'POST'])
+def uploadorder():
+    state = -1
+    grades = 0.0
+    tut_id, num, price, name, tel, address, status, seller_id, buyer_id = 0, 0, 0.0, '', '', '', -1, 0, 0
+    try:
+        tut_id = int(request.args.get('tut_id', 0))
+        num = int(request.args.get('num', 0))
+        price = float(request.args.get('price', 0))
+        name = request.args.get('tel', '').split('@')[0]
+        tel = request.args.get('tel', '').split('@')[1]
+        address = request.args.get('address', '')
+        status = int(request.args.get('status', 0))
+        state += 1 # 0
+    except:
+        pass
+    # get buyer_id
+    ckie = request.cookies.get('cookie')
+    sql = "select * from user where cookie = '%s';" % (ckie)
+    cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+    try:
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        if len(data) == 1:
+            state += 1 # 1
+            buyer_id = data[0]['id']
+            grades = data[0]['grades']
+    except:
+        pass
+    cursor.close()
+    # get seller_id
+    sql = "select * from tutorial where id = '%s';" % (tut_id)
+    cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+    try:
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        if len(data) == 1:
+            state += 1  # 2
+            seller_id = data[0]['host_id']
+    except:
+        pass
+    cursor.close()
+
+    if state == 2:
+        total_incharge = num * price
+        print(buyer_id)
+        # 扣费
+        sql = "update user set grades=%f where id=%d;"%(grades-total_incharge, buyer_id)
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(sql)
+            connection.commit()
+            state += 1
+            print('Successfully update the grades!')
+        except:
+            print('Fai to update the grades!')
+            connection.rollback()
+        cursor.close()
+        #print('success')
+    if state == 3:
+        # 扣费成功
+        sql_order = "insert into tradeorder (seller_id, buyer_id, tutorial_id, num, price, address, tel, status) " \
+                    "values (%d, %d, %d, %d, %f, '%s', '%s', %d)" % (seller_id, buyer_id, tut_id, num, price, address, name+'@'+tel, 0)
+        cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+        try:
+            cursor.execute(sql_order)
+            connection.commit()
+            state += 1
+        except:
+            connection.rollback()
+        cursor.close()
+
+    return simplejson.dumps({
+        'state': state
+    })
+
+@app.route('/SuperCraftsman/getorders', methods=['GET', 'POST'])
+def getorders():
+    state = -1
+    signal = 0
+
+    addresses = []
+    tels = []
+    receivers = []
+    nums = []
+    prices = []
+    tut_ids = []
+    imgs = []
+    titles = []
+    order_ids = []
+    try:
+        signal = int(request.args.get('signal', 0))
+        state += 1
+    except:
+        pass
+
+    ckie = request.cookies.get('cookie')
+    cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+    sql = "select * from user where cookie='%s'" % ckie
+    try:
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        if len(data) == 1:
+            state += 1 # 1
+            usr_id = data[0]['id']
+    except:
+        connection.rollback()
+    cursor.close()
+    if state == 1:
+        if signal == 1:
+            sql = "select * from tradeorder where seller_id=%d and status=0" % usr_id
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+            try:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+                if len(data) > 0:
+                    state += 1  # 2
+                    for d in data:
+                        addresses.append(d['address'])
+                        tel = d['tel']
+                        tels.append(tel.split("@")[1])
+                        receivers.append(tel.split("@")[0])
+                        nums.append(int(d['num']))
+                        prices.append(float(d['price']))
+                        tut_ids.append(int(d['tutorial_id']))
+                        order_ids.append(int(d['id']))
+            except:
+                connection.rollback()
+            cursor.close()
+
+        elif signal == 2:
+            sql = "select * from tradeorder where buyer_id=%d and status<>2" % usr_id
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+            try:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+                if len(data) > 0:
+                    state += 1  # 2
+                    for d in data:
+                        addresses.append(d['address'])
+                        tel = d['tel']
+                        tels.append(tel.split("@")[1])
+                        receivers.append(tel.split("@")[0])
+                        nums.append(int(d['num']))
+                        prices.append(float(d['price']))
+                        tut_ids.append(int(d['tutorial_id']))
+                        order_ids.append(int(d['id']))
+            except:
+                connection.rollback()
+            cursor.close()
+        elif signal == 3:
+            sql = "select * from tradeorder where buyer_id=%d and status=1" % usr_id
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+            try:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+                if len(data) > 0:
+                    state += 1  # 2
+                    for d in data:
+                        addresses.append(d['address'])
+                        tel = d['tel']
+                        tels.append(tel.split("@")[1])
+                        receivers.append(tel.split("@")[0])
+                        nums.append(int(d['num']))
+                        prices.append(float(d['price']))
+                        tut_ids.append(int(d['tutorial_id']))
+                        order_ids.append(int(d['id']))
+            except:
+                connection.rollback()
+            cursor.close()
+        else:
+            pass
+    if state == 2:
+        state += 1
+        for tut_id in tut_ids:
+            imgs.append('../static/tutorials/{}/src/{}'.format(tut_id, os.listdir(
+                os.path.join('static', 'tutorials', str(tut_id), 'src'))[0]))
+            fhandle = open(os.path.join('static', 'tutorials', str(tut_id), 'strut.txt'), 'r', encoding='UTF-8')
+            line = fhandle.readline()
+            fhandle.close()
+            titles.append(line)
+    # print(titles)
+    print(imgs)
+    return simplejson.dumps({
+        'state': state,
+        'tels': tels,
+        'receivers': receivers,
+        'nums': nums,
+        'prices': prices,
+        'imgs': imgs,
+        'titles': titles,
+        'addresses': addresses,
+        'order_ids': order_ids
+    })
+
+@app.route('/SuperCraftsman/updateorder', methods=['GET', 'POST'])
+def updateorder():
+    state = -1
+    signal = -1
+    conp_name = ''
+    try:
+        signal = int(request.args.get('signal', 0))
+        conp_name = request.args.get('conp_name', '')
+        state += 1
+    except:
+        pass
+    if state == 0:
+        if signal == 1:
+            order_no = int(conp_name.split('_')[1])
+            sql = "update tradeorder set status=1 where id=%d;" % (order_no)
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+            try:
+                cursor.execute(sql)
+                connection.commit()
+                state += 1# 1
+            except:
+                connection.rollback()
+            cursor.close()
+        elif signal == 3:
+            # 1) update status
+            order_no = int(conp_name.split('_')[1])
+            sql = "update tradeorder set status=2 where id=%d;" % (order_no)
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+            try:
+                cursor.execute(sql)
+                connection.commit()
+                state += 1  # 1
+            except:
+                connection.rollback()
+            cursor.close()
+            # 2) grade_of_seller ++
+            sql = "select * from tradeorder where id=%d;" % (order_no)
+            cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+            try:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+                if len(data) == 1:
+                    state += 1  # 2
+                    seller_id = data[0]['seller_id']
+                    buyer_id = data[0]['buyer_id']
+                    num = data[0]['num']
+                    price = data[0]['price']
+                    tut_id = data[0]['tutorial_id']
+            except:
+                connection.rollback()
+            cursor.close()
+
+            if state == 2:
+                profit = num * price
+                sql = "update user set grades = grades+%d where id=%d;" % (profit, seller_id)
+                cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+                try:
+                    cursor.execute(sql)
+                    connection.commit()
+                    state += 1 # 2
+                except:
+                    connection.rollback()
+                cursor.close()
+            # 3) num_order ++
+            if state == 3:
+                sql = "update tutorial set num_order=num_order+1 where id=%d;" % (tut_id)
+                cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
+                try:
+                    cursor.execute(sql)
+                    connection.commit()
+                    state += 1  # 3
+                except:
+                    connection.rollback()
+                cursor.close()
+                pass
+        else:
+            pass
+    print(state)
+    return simplejson.dumps({
+        'state': state
+    })
+
+@app.route('/SuperCraftsman/orders', methods=['GET', 'POST'])
+def orders():
+    response = make_response(render_template('orders.html'))
+    return response
 """=================================================================================================== comment' part """
-"""
-sql_cmm = '''create table comment(
-id int primary key auto_increment,
-gdatetime datetime,
-context text(1000),
-usr_id int,
-num_like int,
-tutorial_id int,
-foreign key(tutorial_id) references tutorial(id),
-reply_id int default -1
-)'''
-"""
 @app.route('/SuperCraftsman/uploadcomment', methods=['post'])
 def uploadcomment():
     # get user_id
@@ -965,7 +1410,8 @@ def uploadcomment():
 
         print(txt_comment)
         pass
-    return 'success'
+    return redirect(url_for('tutorialdetails', tutorial_no=tut_id))
+
 
 @app.route('/SuperCraftsman/addcomment', methods=['GET'])
 def addcomment():
@@ -1028,6 +1474,7 @@ def addcomment():
 
 @app.route('/SuperCraftsman/uploadreply', methods=['post'])
 def uploadreply():
+    state = -1
     txt_reply = ''
     to_id = 0
     from_id = 0
@@ -1053,14 +1500,13 @@ def uploadreply():
         try:
             cursor.execute(sql_comment)
             connection.commit()
-            # print('Successfully create the comment!')
         except Exception as e:
-            # print(e)
             connection.rollback()
         cursor.close()
 
         pass
-    return 'success'
+    # redirect(url_for('asset', asset_id=info, page=2, tag='balances'))
+    return redirect(url_for('tutorialdetails', tutorial_no=from_id))
 
 @app.route('/SuperCraftsman/getreply', methods=['GET',' POST'])
 def getreply():

@@ -345,6 +345,20 @@ h3{
     vertical-align:middle;
     text-align: center;
 }
+
+.order_input2{
+    border-radius: 10px;
+    width: 200px;
+    height: 40px;
+    border: 1px solid #ededed;
+    width: 150px;
+    background-color: #ffffff;
+    color: #573314;
+    font-size: 25px;
+    vertical-align:middle;
+    text-align: center;
+}
+
 .operator{
     height: 40px;
     border: none;
@@ -354,6 +368,17 @@ h3{
     font-size: 25px;
     vertical-align:middle;
     text-align: center;
+}
+
+.operator2{
+    height: 40px;
+    border: none;
+    width: 100px;
+    background-color: #ffffff;
+    color: #9b9696;
+    font-size: 25px;
+    vertical-align:middle;
+    text-align: left;
 }
 
 .image_btn{
@@ -392,4 +417,51 @@ h3{
     font-size: 60px;
     vertical-align:middle;
     text-align: center;
+}
+.tabbox{}
+.tabbox ul{list-style:none;display:table;margin:0px;}
+.tabbox ul li{float:left;width:100px;line-height:30px;padding-left:10px;border:none;margin-right:-1px;cursor:pointer;text-align: center;background-color: white}
+.tabbox ul li.active{background-color: #d5d6d6;color:white;font-weight:bold;}
+.tabbox .content{border:1px solid #aaccff;padding:10px;}
+.tabbox .content>div{display:none;}
+.tabbox .content>div.active{display:block;}
+.middle-box{
+    align-self: center;
+    margin-left: 15%;
+    margin-right: 15%;
+    margin-top: 100px;
+}
+
+.td_css{
+    padding-left: 10px; background-color: #ffffff; padding: 10px;
+}
+.content{
+    background-color: white;
+    border: 1px solid #e5e5e5;
+    width: 100%;
+}
+
+.ack_btn{
+    border-radius: 10px;
+    width: 100px;
+    height: 40px;
+    border: 2px solid #ff2100;
+    background-color: #ffaea1;
+    color: white;
+    font-size: 15px;
+    vertical-align:middle;
+    text-align: center;
+    align-self: right;
+}
+.ack_btn:active{
+    order-radius: 10px;
+    width: 100px;
+    height: 40px;
+    border: 2px solid #ff1900;
+    background-color: #79443b;
+    color: white;
+    font-size: 15px;
+    vertical-align:middle;
+    text-align: center;
+    align-self: right;
 }

@@ -64,12 +64,13 @@ def from_index_to_register():
         return response
     else:
         flag = 0
+        args = (account)
         '''make sure not repeated accounts'''
-        sql = "select * from user where account = '%s';" % account
+        sql = "select * from user where account = %s;"
         cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
         # nickname = None
         try:
-            cursor.execute(sql)
+            cursor.execute(sql, args)
             data = cursor.fetchall()
             if len(data) > 0:
                 flag = 2
@@ -88,12 +89,13 @@ def from_index_to_register():
         outdate = datetime.datetime.today() + datetime.timedelta(days=1)
         ckie = str(uuid.uuid4())
 
+
         salt = get_salt()
-        sql_manager = "insert into user (account, salt, password, nickname, email, cookie, photopth) values ('%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (
-        account, salt, get_md5(password, salt), nickname, email, ckie, ("../"+'static'+'/'+'src'+'/'+'images'+'/'+'default.png'))
+        args = (account, salt, get_md5(password, salt), nickname, email, ckie, ("../"+'static'+'/'+'src'+'/'+'images'+'/'+'default.png'))
+        sql_manager = "insert into user (account, salt, password, nickname, email, cookie, photopth) values (%s, %s, %s, %s, %s, %s, %s)"
         cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
         try:
-            cursor.execute(sql_manager)
+            cursor.execute(sql_manager, args)
             connection.commit()
             # print('Successfully create the craftsman {}!'.format(nickname))
             flag = 1
@@ -133,12 +135,13 @@ def login():
     account = request.args.get('account', '')
     password = request.args.get('password', '')
 
-    sql = "select * from user where account = '%s';" % account
+    args = (account)
+    sql = "select * from user where account = %s;"
     cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
     state = -1
     nickname = None
     try:
-        cursor.execute(sql)
+        cursor.execute(sql, args)
         data = cursor.fetchall()
         if len(data) > 0:
             # print(data[0])
@@ -295,7 +298,7 @@ def tutorialeditor():
 @app.route('/SuperCraftsman/uploadtutorial', methods=['post'])
 def uploadtutorial():
     # print(request.args.get('a'))
-    # print("uploadtutorial called")
+    print("uploadtutorial called")
     title = request.form['tutorial_title']
     classification = request.form['classification']
     try:
@@ -338,21 +341,23 @@ def uploadtutorial():
                 cursor.execute(sql)
                 data = cursor.fetchall()
                 if len(data) == 1:
+                    # print("afafa")
                     state += 1
                     d = data[0]
                     user_id = int(d['id'])
             except:
                 connection.rollback()
             cursor.close()
-
+    # print(state)
     if state == 2:
-        sql = "select * from tutorial where host_id = %d and title = '%s';" % (user_id, title_)
+        title_ = pymysql.escape_string(title_)
+        sql = "select * from tutorial where host_id = %d and title = '%s';"%(user_id, title_)
         cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
         try:
             cursor.execute(sql)
             data = cursor.fetchall()
-            print("用中文查询成功")
-            print(len(data))
+            # print("用中文查询成功")
+            # print(len(data))
             if len(data) == 0:
                 # not found
                 state += 1
@@ -370,7 +375,7 @@ def uploadtutorial():
 
                 # newly build dir
                 pth = os.path.join(os.getcwd(), 'static', 'tutorials', str(count2+1))
-                print(pth)
+                # print(pth)
                 if not os.path.exists(pth):
                     # print("dasda")
                     os.mkdir(pth)
@@ -381,17 +386,20 @@ def uploadtutorial():
                     fobj.close()
 
                 # new record
-                sql2 = "insert into tutorial (srcpth, title, host_id, classification, price) values ('%s', '%s', %d, '%s', %f)" % (str(count2+1), title_, user_id, classification, price)
+                title_ = pymysql.escape_string(title_)
+                classification = pymysql.escape_string(classification)
+                sql2 = "insert into tutorial (srcpth, title, host_id, classification, price) values ('%s', '%s', %d, '%s', %f)"%(str(count2+1), title_, user_id, classification, price)
                 cursor2 = connection.cursor(cursor=pymysql.cursors.DictCursor)
                 try:
                     cursor2.execute(sql2)
                     connection.commit()
+                    print("dasdasdasda")
                 except:
                     connection.rollback()
                 cursor2.close()
             else:
                 # the tutorial has already existed
-                print("found it!")
+                # print("found it!")
                 d = data[0]
                 pth = d['srcpth']
                 pth = os.path.join(os.getcwd(), 'static', 'tutorials', pth)
@@ -614,10 +622,10 @@ def gettutorials():
             for j in range(len(title)):
                 title[j] = chr(int(title[j]))
             title = ''.join(title)
-            print('{}-{}'.format(d['classification'], title))
+            # print('{}-{}'.format(d['classification'], title))
 
             rel = difflib.SequenceMatcher(None, type, title).quick_ratio()
-            print(rel)
+            # print(rel)
             if d['classification'] == type or rel >= 0.2:
                 tut_ids.append(d['id'])
                 host_ids.append(d['host_id'])
@@ -647,7 +655,7 @@ def gettutorials():
                     titles.append(d['title'])
                 pass
         except:
-            print('fail1')
+            # print('fail1')
             connection.rollback()
         cursor.close()
 
@@ -671,7 +679,7 @@ def gettutorials():
                     host_names.append(data[0]['nickname'])
                     host_photos.append(data[0]['photopth'])
             except:
-                print('fail2')
+                # print('fail2')
                 connection.rollback()
             cursor.close()
     # print(host_photos)
@@ -735,7 +743,7 @@ def gettutorial():
         pass
     else:
         pass
-    print(price)
+    # print(price)
     return simplejson.dumps({
         'state': state,
         'imgs': imgs,
@@ -849,7 +857,7 @@ def validation():
                 except:
                     pass
                 cursor.close()
-                print(t_pths)
+                # print(t_pths)
 
                 # get num_tut
 
@@ -951,7 +959,7 @@ def uploadinfo():
             (sel_year is not None) and (sel_month is not None) and (sel_day is not None) and \
             (province is not None) and (city is not None) and (area is not None):
     '''
-
+    '''
     print(nickname)
     print(email)
     print(procession)
@@ -963,6 +971,7 @@ def uploadinfo():
     print(city)
     print(area)
     print(sex)
+    '''
 
     state = 0
     time_ = str(int(time.time()))
@@ -1019,17 +1028,17 @@ def uploadinfo():
         cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
         birthday = "{}-{}-{}".format(sel_year, sel_month, sel_day)
         if whether_to_modify_the_photo is True:
-            sql = "update user set photopth='%s', nickname='%s', email='%s', sex='%s', procession='%s', signature='%s', " \
-                  "province='%s', ciy='%s', county='%s', birth='%s' where account='%s'" % \
-                  (pth, nickname, email, sex, procession, signature, province, city, area, birthday, account)
+            args = (pth, nickname, email, sex, procession, signature, province, city, area, birthday, account)
+            sql = "update user set photopth=%s, nickname=%s, email=%s, sex=%s, procession=%s, signature=%s, " \
+                  "province=%s, ciy=%s, county=%s, birth=%s where account=%s"
             # print("{}-{}".format(whether_to_modify_the_photo, 1))
         else:
-            sql = "update user set nickname='%s', email='%s', sex='%s', procession='%s', signature='%s', " \
-                  "province='%s', ciy='%s', county='%s', birth='%s' where account='%s'" % \
-                  (nickname, email, sex, procession, signature, province, city, area, birthday, account)
+            args = (nickname, email, sex, procession, signature, province, city, area, birthday, account)
+            sql = "update user set nickname=%s, email=%s, sex=%s, procession=%s, signature=%s, " \
+                  "province=%s, ciy=%s, county=%s, birth=%s where account=%s"
             # print("{}-{}".format(whether_to_modify_the_photo, 2))
         try:
-            cursor.execute(sql)
+            cursor.execute(sql, args)
             connection.commit()
             # print("Successful modification!")
         except:
@@ -1080,7 +1089,7 @@ def recharge():
 @app.route('/SuperCraftsman/incharge', methods=['GET', 'POST'])
 def incharge():
     state = request.args.get('state')
-    print(state)
+    # print(state)
     return simplejson.dumps({
         'state': -1
     })
@@ -1138,14 +1147,15 @@ def uploadorder():
             cursor.execute(sql)
             connection.commit()
             state += 1
-            print('Successfully update the grades!')
+            # print('Successfully update the grades!')
         except:
-            print('Fai to update the grades!')
+            # print('Fai to update the grades!')
             connection.rollback()
         cursor.close()
         #print('success')
     if state == 3:
         # 扣费成功
+        address = pymysql.escape_string(address)
         sql_order = "insert into tradeorder (seller_id, buyer_id, tutorial_id, num, price, address, tel, status) " \
                     "values (%d, %d, %d, %d, %f, '%s', '%s', %d)" % (seller_id, buyer_id, tut_id, num, price, address, name+'@'+tel, 0)
         cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
@@ -1267,7 +1277,7 @@ def getorders():
             fhandle.close()
             titles.append(line)
     # print(titles)
-    print(imgs)
+    # print(imgs)
     return simplejson.dumps({
         'state': state,
         'tels': tels,
@@ -1357,7 +1367,7 @@ def updateorder():
                 pass
         else:
             pass
-    print(state)
+    # print(state)
     return simplejson.dumps({
         'state': state
     })
@@ -1385,7 +1395,7 @@ def uploadcomment():
     except:
         connection.rollback()
     cursor.close()
-    print(user_id)
+    # print(user_id)
 
     flag = False
     try:
@@ -1396,19 +1406,20 @@ def uploadcomment():
         pass
 
     if flag:
+        txt_comment = pymysql.escape_string(txt_comment)
         sql_comment = "insert into comment (context, usr_id, num_like, tutorial_id, reply_id) values ('%s', %d, %d,%d, -1)" % (txt_comment, int(user_id), 0, int(tut_id))
         cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
         try:
             cursor.execute(sql_comment)
             connection.commit()
-            print('Successfully create the comment!')
+            # print('Successfully create the comment!')
             flag = 1
         except:
             connection.rollback()
             flag = -1
         cursor.close()
 
-        print(txt_comment)
+        # print(txt_comment)
         pass
     return redirect(url_for('tutorialdetails', tutorial_no=tut_id))
 
@@ -1417,7 +1428,7 @@ def uploadcomment():
 def addcomment():
     state = -1
     cmm_id = request.args.get('id', 0)
-    print(cmm_id)
+    # print(cmm_id)
     sql = "select * from comment where tutorial_id = %d and reply_id = %d;" % (int(cmm_id), -1)
     cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
     state += 1
@@ -1460,7 +1471,7 @@ def addcomment():
         usr_accounts.append(usr_account)
         usr_photopths.append(usr_photopth)
         pass
-    print(usr_photopths)
+    # print(usr_photopths)
     return simplejson.dumps({
         'state': state,
 
@@ -1495,6 +1506,7 @@ def uploadreply():
     if from_id == 0:
         print("nothing to do")
     else:
+        txt_reply = pymysql.escape_string(txt_reply)
         sql_comment = "insert into comment (context, usr_id, num_like, tutorial_id, reply_id) values ('%s', %d, %d,%d, %d)" % (txt_reply, usr_id, 0, from_id, to_id)
         cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
         try:
@@ -1511,7 +1523,7 @@ def uploadreply():
 @app.route('/SuperCraftsman/getreply', methods=['GET',' POST'])
 def getreply():
     reply_to_id = request.args.get('reply_id', 0)
-    print(reply_to_id)
+    # print(reply_to_id)
     state = -1
     sql = "select * from comment where reply_id = %d;" % (int(reply_to_id))
     cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
@@ -1545,8 +1557,8 @@ def getreply():
                 usr_photopths.append(data[0]['photopth'])
             except:
                 connection.rollback()
-    print(replies)
-    print(date_stamps)
+    # print(replies)
+    # print(date_stamps)
     return simplejson.dumps({
         'state': state,
         'no': 'no',

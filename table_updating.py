@@ -29,11 +29,6 @@ cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
 cursor.execute(sql)
 cursor.close()
 
-sql = "alter table likes change tut_like tut_id int;"
-cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
-cursor.execute(sql)
-cursor.close()
-
 sql_cmm = '''create table likes(
 id int primary key auto_increment,
 usr_id int default 0,

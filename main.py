@@ -39,7 +39,6 @@ levels = [0, 100, 200, 500, 1000, 2000, 5000, 10000, 100000]
 
 app = Flask(__name__)
 
-
 '''home page'''
 @app.route('/SuperCraftsman')
 @app.route('/index')
